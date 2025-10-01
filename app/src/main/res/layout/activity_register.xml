@@ -27,19 +27,31 @@
             android:layout_width="200dp"
             android:layout_height="140dp"
             android:layout_gravity="center"
-            android:src="@drawable/wattway_logo"
+            android:src="@drawable/wattway_logo2"
             android:contentDescription="WattWay Logo"
             android:layout_marginBottom="8dp"/>
+
+        <!--App Name-->
+        <TextView
+            android:id="@+id/AppName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="WattWay"
+            android:textSize="27sp"
+            android:layout_gravity="center"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="15dp"/>
 
         <!--Create a account-->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Create your account"
-            android:textSize="27sp"
+            android:textSize="22sp"
             android:layout_gravity="center"
             android:textStyle="bold"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="20dp" />
 
         <!-- Full Name -->
         <EditText
