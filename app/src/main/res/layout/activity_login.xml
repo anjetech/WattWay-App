@@ -6,6 +6,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
     tools:context=".LoginActivity">
 
     <LinearLayout
@@ -80,7 +81,7 @@
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="LOGIN"
+            android:text="Sign in"
             android:textColor="#FFFFFF"
             android:textStyle="bold"
             android:background="@drawable/rounded_button"
@@ -100,7 +101,9 @@
                 android:layout_height="wrap_content"
                 android:text="Forgot password?"
                 android:textColor="#1E90FF"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                android:clickable="true"
+                android:focusable="true"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -115,10 +118,12 @@
                 android:layout_height="wrap_content"
                 android:text="Create account"
                 android:textColor="#1E90FF"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                android:clickable="true"
+                android:focusable="true"/>
         </LinearLayout>
 
-        <!-- Note (optional) -->
+        <!-- Note -->
         <TextView
             android:id="@+id/tvPrivacyNote"
             android:layout_width="wrap_content"

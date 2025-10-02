@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base app theme with no action bar -->
+    <style name="Theme.WattWay.NoActionBar" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@android:color/white</item>
+        <item name="colorPrimaryDark">@android:color/white</item>
+        <item name="colorAccent">#2F8FFF</item>
+        <item name="android:statusBarColor">@android:color/white</item>
+    </style>
+
+</resources>

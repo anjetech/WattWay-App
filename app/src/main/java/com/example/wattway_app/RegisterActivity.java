@@ -1,9 +1,11 @@
 package com.example.wattway_app;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -20,6 +22,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private EditText fullNameEditText, emailEditText, passwordEditText, confirmPasswordEditText;
     private Button registerButton;
+    private TextView tvLogin;
 
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
@@ -46,8 +49,20 @@ public class RegisterActivity extends AppCompatActivity {
         passwordEditText = findViewById(R.id.etPassword);
         confirmPasswordEditText = findViewById(R.id.etConfirmPassword);
         registerButton = findViewById(R.id.btnRegister);
+        tvLogin = findViewById(R.id.tvLogin);
 
-        //  Register logic
+        // Handle "Already have an account? Sign In" click
+        tvLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(RegisterActivity.this, "Navigating to Login", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
+        // Register logic
         registerButton.setOnClickListener(v -> {
             String fullName = fullNameEditText.getText().toString().trim();
             String email = emailEditText.getText().toString().trim();
@@ -72,7 +87,10 @@ public class RegisterActivity extends AppCompatActivity {
                             mDatabase.child(userId).setValue(user)
                                     .addOnSuccessListener(aVoid -> {
                                         Toast.makeText(RegisterActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show();
-                                        // TODO: Navigate to login or home screen
+                                        // Navigate to login screen after successful registration
+                                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                                        startActivity(intent);
+                                        finish(); // Optional: close RegisterActivity
                                     })
                                     .addOnFailureListener(e -> {
                                         Toast.makeText(RegisterActivity.this, "Failed to save user data", Toast.LENGTH_SHORT).show();

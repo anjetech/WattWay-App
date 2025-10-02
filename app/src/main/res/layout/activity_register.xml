@@ -114,9 +114,12 @@
             android:layout_height="wrap_content"
             android:text="Already have an account? Sign In"
             android:textColor="#1E90FF"
+            android:textSize="16sp"
             android:layout_gravity="center"
             android:layout_marginTop="16dp"
-            android:textSize="16sp"/>
+            android:clickable="true"
+            android:focusable="true" />
+
 
         <TextView
             android:layout_width="wrap_content"
