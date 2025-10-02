@@ -36,18 +36,18 @@ public class RegisterActivity extends AppCompatActivity {
             return insets;
         });
 
-        // 🔧 Initialize Firebase
+        // Initialize Firebase
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference("Users");
 
-        // 🔗 Link UI elements
+        // Link UI elements
         fullNameEditText = findViewById(R.id.etFullName);
         emailEditText = findViewById(R.id.etEmail);
         passwordEditText = findViewById(R.id.etPassword);
         confirmPasswordEditText = findViewById(R.id.etConfirmPassword);
         registerButton = findViewById(R.id.btnRegister);
 
-        // 🧠 Register logic
+        //  Register logic
         registerButton.setOnClickListener(v -> {
             String fullName = fullNameEditText.getText().toString().trim();
             String email = emailEditText.getText().toString().trim();
