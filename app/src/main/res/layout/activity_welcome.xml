@@ -25,11 +25,11 @@
         <ImageView
             android:id="@+id/logoImage"
             android:layout_width="match_parent"
-            android:layout_height="210dp"
+            android:layout_height="229dp"
             android:layout_gravity="center"
             android:layout_marginBottom="16dp"
             android:contentDescription="WattWay Logo"
-            android:src="@drawable/WattWay_Transparent" />
+            android:src="@drawable/wattway_transparent" />
 
         <!-- Welcome Text -->
         <TextView
