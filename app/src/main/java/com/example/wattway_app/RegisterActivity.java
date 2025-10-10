@@ -2,9 +2,11 @@ package com.example.wattway_app;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +25,7 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText fullNameEditText, emailEditText, passwordEditText, confirmPasswordEditText;
     private Button registerButton;
     private TextView tvLogin;
+    private ImageView ivTogglePassword, ivToggleConfirm;
 
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
@@ -32,6 +35,8 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_register);
+
+
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -50,6 +55,31 @@ public class RegisterActivity extends AppCompatActivity {
         confirmPasswordEditText = findViewById(R.id.etConfirmPassword);
         registerButton = findViewById(R.id.btnRegister);
         tvLogin = findViewById(R.id.tvLogin);
+        ivTogglePassword = findViewById(R.id.ivTogglePassword);
+        ivToggleConfirm = findViewById(R.id.ivToggleConfirm);
+
+        // Toggle password visibility
+        ivTogglePassword.setOnClickListener(v -> {
+            if (passwordEditText.getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
+                passwordEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                ivTogglePassword.setImageResource(R.drawable.eye);
+            } else {
+                passwordEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                ivTogglePassword.setImageResource(R.drawable.eye);
+            }
+            passwordEditText.setSelection(passwordEditText.getText().length());
+        });
+
+        ivToggleConfirm.setOnClickListener(v -> {
+            if (confirmPasswordEditText.getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
+                confirmPasswordEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                ivToggleConfirm.setImageResource(R.drawable.eye);
+            } else {
+                confirmPasswordEditText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                ivToggleConfirm.setImageResource(R.drawable.eye);
+            }
+            confirmPasswordEditText.setSelection(confirmPasswordEditText.getText().length());
+        });
 
         // Handle "Already have an account? Sign In" click
         tvLogin.setOnClickListener(new View.OnClickListener() {
@@ -61,8 +91,6 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-
-        // Register logic
         // Register logic
         registerButton.setOnClickListener(v -> {
             String fullName = fullNameEditText.getText().toString().trim();
@@ -110,14 +138,12 @@ public class RegisterActivity extends AppCompatActivity {
                                 });
                     });
         });
-
-
-        }
-
+    }
 
     private void goToHome() {
         Intent i = new Intent(this, HomePageActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        Toast.makeText(this, "Navigating to HomePageActivity", Toast.LENGTH_SHORT).show();
         startActivity(i);
         finish();
     }

@@ -65,16 +65,34 @@
             android:padding="12dp"
             android:background="@drawable/rounded_edittext"/>
 
-        <!-- Password -->
-        <EditText
-            android:id="@+id/etPasswordLogin"
+        <!-- Password with Eye Toggle -->
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:padding="12dp"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/rounded_edittext"/>
+            android:layout_marginTop="12dp">
+
+            <EditText
+                android:id="@+id/etPasswordLogin"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="Password"
+                android:inputType="textPassword"
+                android:paddingStart="12dp"
+                android:paddingEnd="48dp"
+                android:background="@drawable/rounded_edittext"/>
+
+            <ImageView
+                android:id="@+id/ivToggleLoginPassword"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="12dp"
+                android:src="@drawable/eye"
+                android:contentDescription="Toggle Password Visibility"
+                android:clickable="true"
+                android:focusable="true"/>
+        </RelativeLayout>
 
         <!-- Login Button -->
         <androidx.appcompat.widget.AppCompatButton
@@ -133,7 +151,5 @@
             android:textColor="#888888"
             android:layout_gravity="center"
             android:layout_marginTop="18dp"/>
-
     </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

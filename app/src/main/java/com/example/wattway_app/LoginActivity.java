@@ -1,9 +1,11 @@
-package com.example.wattway_app;   // <- match your package
+package com.example.wattway_app;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,6 +18,7 @@ import com.google.firebase.auth.FirebaseUser;
 public class LoginActivity extends AppCompatActivity {
 
     private EditText etEmailLogin, etPasswordLogin;
+    private ImageView ivToggleLoginPassword;
     private AppCompatButton btnLogin;
     private TextView tvGoRegister, tvForgotPassword;
 
@@ -28,15 +31,34 @@ public class LoginActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
+        // Link UI elements
         etEmailLogin = findViewById(R.id.etEmailLogin);
         etPasswordLogin = findViewById(R.id.etPasswordLogin);
+        ivToggleLoginPassword = findViewById(R.id.ivToggleLoginPassword);
         btnLogin = findViewById(R.id.btnLogin);
         tvGoRegister = findViewById(R.id.tvGoRegister);
         tvForgotPassword = findViewById(R.id.tvForgotPassword);
 
+        // Toggle password visibility
+        ivToggleLoginPassword.setOnClickListener(v -> {
+            if (etPasswordLogin.getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
+                etPasswordLogin.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                ivToggleLoginPassword.setImageResource(R.drawable.eye);
+            } else {
+                etPasswordLogin.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                ivToggleLoginPassword.setImageResource(R.drawable.eye);
+            }
+            etPasswordLogin.setSelection(etPasswordLogin.getText().length());
+        });
+
+        // Login button
         btnLogin.setOnClickListener(v -> signIn());
+
+        // Navigation to Register
         tvGoRegister.setOnClickListener(v ->
                 startActivity(new Intent(this, RegisterActivity.class)));
+
+        // Forgot password
         tvForgotPassword.setOnClickListener(v -> sendResetEmail());
     }
 
@@ -44,8 +66,16 @@ public class LoginActivity extends AppCompatActivity {
         String email = etEmailLogin.getText().toString().trim();
         String pass  = etPasswordLogin.getText().toString().trim();
 
-        if (TextUtils.isEmpty(email)) { etEmailLogin.setError("Email required"); etEmailLogin.requestFocus(); return; }
-        if (TextUtils.isEmpty(pass))  { etPasswordLogin.setError("Password required"); etPasswordLogin.requestFocus(); return; }
+        if (TextUtils.isEmpty(email)) {
+            etEmailLogin.setError("Email required");
+            etEmailLogin.requestFocus();
+            return;
+        }
+        if (TextUtils.isEmpty(pass)) {
+            etPasswordLogin.setError("Password required");
+            etPasswordLogin.requestFocus();
+            return;
+        }
 
         btnLogin.setEnabled(false);
         btnLogin.setText("Signing in…");
@@ -56,9 +86,7 @@ public class LoginActivity extends AppCompatActivity {
 
             if (task.isSuccessful()) {
                 Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(LoginActivity.this, HomePageActivity.class);
-                startActivity(intent);
-                finish();
+                goToHome();
             } else {
                 String msg = task.getException() != null ? task.getException().getMessage() : "Login failed";
                 Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
@@ -86,11 +114,12 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
-    // Optional: keep users signed in
     @Override
     protected void onStart() {
         super.onStart();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) { goToHome(); }
+        if (user != null) {
+            goToHome();
+        }
     }
 }
