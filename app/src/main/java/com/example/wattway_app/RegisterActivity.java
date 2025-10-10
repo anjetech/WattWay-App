@@ -63,42 +63,62 @@ public class RegisterActivity extends AppCompatActivity {
 
 
         // Register logic
+        // Register logic
         registerButton.setOnClickListener(v -> {
             String fullName = fullNameEditText.getText().toString().trim();
-            String email = emailEditText.getText().toString().trim();
+            String email    = emailEditText.getText().toString().trim();
             String password = passwordEditText.getText().toString().trim();
-            String confirmPassword = confirmPasswordEditText.getText().toString().trim();
+            String confirm  = confirmPasswordEditText.getText().toString().trim();
 
-            if (fullName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-                Toast.makeText(RegisterActivity.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+            if (fullName.isEmpty() || email.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (!password.equals(confirm)) {
+                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if (!password.equals(confirmPassword)) {
-                Toast.makeText(RegisterActivity.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
-                return;
-            }
+            registerButton.setEnabled(false);
 
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            String userId = mAuth.getCurrentUser().getUid();
-                            User user = new User(fullName, email);
-                            mDatabase.child(userId).setValue(user)
-                                    .addOnSuccessListener(aVoid -> {
-                                        Toast.makeText(RegisterActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show();
-                                        // Navigate to login screen after successful registration
-                                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                                        startActivity(intent);
-                                        finish(); // Optional: close RegisterActivity
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        Toast.makeText(RegisterActivity.this, "Failed to save user data", Toast.LENGTH_SHORT).show();
-                                    });
-                        } else {
-                            Toast.makeText(RegisterActivity.this, "Registration failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        registerButton.setEnabled(true);
+
+                        if (!task.isSuccessful()) {
+                            Toast.makeText(this,
+                                    "Registration failed: " +
+                                            (task.getException() != null ? task.getException().getMessage() : ""),
+                                    Toast.LENGTH_LONG).show();
+                            return;
                         }
+
+                        // User created. Try to save a profile (optional).
+                        String userId = mAuth.getCurrentUser().getUid();
+                        User user = new User(fullName, email);
+
+                        mDatabase.child(userId).setValue(user)
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show();
+                                    goToHome();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(this, "Saved auth, but failed to save profile: " + e.getMessage(),
+                                            Toast.LENGTH_LONG).show();
+                                    // Still continue to Home
+                                    goToHome();
+                                });
                     });
         });
+
+
+        }
+
+
+    private void goToHome() {
+        Intent i = new Intent(this, HomePageActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(i);
+        finish();
     }
 }
