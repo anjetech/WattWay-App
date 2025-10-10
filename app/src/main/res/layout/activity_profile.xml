@@ -1,10 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/profileLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#1A8BE4"
     tools:context=".ProfileActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:background="#50AEF8"
+        android:gravity="center_horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Logo at Top -->
+        <ImageView
+            android:id="@+id/logoImage"
+            android:layout_width="227dp"
+            android:layout_height="165dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="8dp"
+            android:contentDescription="WattWay Logo"
+            android:src="@drawable/wattway_transparent" />
+
+        <!-- App Name -->
+        <TextView
+            android:id="@+id/appName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="WattWay"
+            android:textSize="30dp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:layout_gravity="center"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Profile Title -->
+        <TextView
+            android:id="@+id/profileTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Profile"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:layout_gravity="center"
+            android:layout_marginBottom="8dp" />
+
+
+        <!-- Username -->
+        <TextView
+            android:id="@+id/userName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="John Doe"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:layout_gravity="center"
+            android:layout_marginBottom="4dp" />
+
+        <!-- Email -->
+        <TextView
+            android:id="@+id/userEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="driver@gmail.com"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:layout_gravity="center"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Favorite Stations -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/favoriteStations"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Favorite Stations: 3"
+            android:textColor="#2196F3"
+            android:textStyle="bold"
+            android:background="@drawable/rounded_white_button"
+            android:layout_marginTop="12dp" />
+
+        <!-- Change Password -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/changePassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Change Password"
+            android:textColor="#2196F3"
+            android:textStyle="bold"
+            android:background="@drawable/rounded_white_button"
+            android:layout_marginTop="12dp" />
+
+        <!-- Edit Email -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/editEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Edit Email"
+            android:textColor="#2196F3"
+            android:textStyle="bold"
+            android:background="@drawable/rounded_white_button"
+            android:layout_marginTop="12dp" />
+
+        <!-- Sign Out Button -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/signOutButton"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:text="Sign Out"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:backgroundTint="#D32F2F"
+            android:layout_gravity="center"
+            android:layout_marginTop="32dp" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
