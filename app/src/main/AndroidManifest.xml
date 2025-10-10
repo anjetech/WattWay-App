@@ -14,7 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WattWayApp"
         tools:targetApi="31">
-
+        <activity
+            android:name=".LoadsheddingActivity"
+            android:exported="false" />
         <!-- Welcome screen is now the launcher -->
         <activity
             android:name=".WelcomeActivity"
@@ -22,24 +24,21 @@
             android:theme="@style/Theme.WattWay.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".HomePageActivity"
             android:exported="false" />
-
         <activity
             android:name=".LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.WattWay.NoActionBar" />
-
         <activity
             android:name=".RegisterActivity"
             android:exported="true"
             android:theme="@style/Theme.WattWay.NoActionBar" />
-
     </application>
 
 </manifest>
