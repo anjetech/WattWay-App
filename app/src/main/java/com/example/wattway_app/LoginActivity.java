@@ -64,15 +64,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void signIn() {
-        String fullName = etFullName.getText().toString().trim(); // Get name
-        String email = etEmailLogin.getText().toString().trim();
-        String pass  = etPasswordLogin.getText().toString().trim();
+        String fullName = etFullName.getText().toString().trim(); // optional
+        String email    = etEmailLogin.getText().toString().trim();
+        String pass     = etPasswordLogin.getText().toString().trim();
 
-        if (TextUtils.isEmpty(fullName)) {
-            etFullName.setError("Name required");
-            etFullName.requestFocus();
-            return;
-        }
         if (TextUtils.isEmpty(email)) {
             etEmailLogin.setError("Email required");
             etEmailLogin.requestFocus();
@@ -84,22 +79,30 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
+        // 👇 Make captured vars effectively final
+        final String nameToSend  = TextUtils.isEmpty(fullName) ? "User" : fullName;
+        final String emailToSend = email;
+
         btnLogin.setEnabled(false);
         btnLogin.setText("Signing in…");
 
-        mAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(this, task -> {
-            btnLogin.setEnabled(true);
-            btnLogin.setText("LOGIN");
+        mAuth.signInWithEmailAndPassword(email, pass)
+                .addOnCompleteListener(LoginActivity.this, task -> {
+                    btnLogin.setEnabled(true);
+                    btnLogin.setText("LOGIN");
 
-            if (task.isSuccessful()) {
-                Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
-                goToHome(fullName, email);
-            } else {
-                String msg = task.getException() != null ? task.getException().getMessage() : "Login failed";
-                Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-            }
-        });
+                    if (task.isSuccessful()) {
+                        goToHome(nameToSend, emailToSend);
+                    } else {
+                        String msg = (task.getException() != null)
+                                ? task.getException().getMessage()
+                                : "Login failed";
+                        Toast.makeText(LoginActivity.this, msg, Toast.LENGTH_LONG).show();
+                    }
+                });
     }
+
+
 
     private void sendResetEmail() {
         String email = etEmailLogin.getText().toString().trim();
@@ -115,7 +118,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void goToHome(String fullName, String email) {
-        Intent i = new Intent(this, HomePageActivity.class);
+        Intent i = new Intent(LoginActivity.this, HomePageActivity.class);
         i.putExtra("fullName", fullName);
         i.putExtra("email", email);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);

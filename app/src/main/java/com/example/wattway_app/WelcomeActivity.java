@@ -8,6 +8,22 @@ import androidx.appcompat.widget.AppCompatButton;
 
 public class WelcomeActivity extends AppCompatActivity {
 
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser() != null) {
+            // User already signed in → go straight to Home and clear the back stack
+            startActivity(
+                    new Intent(this, HomePageActivity.class)
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            );
+            // Optional: finish() for safety (CLEAR_TASK already handles it)
+            finish();
+        }
+    }
+
+
     private AppCompatButton btnRegister, btnSignIn;
 
     @Override
@@ -23,7 +39,7 @@ public class WelcomeActivity extends AppCompatActivity {
         });
 
         btnSignIn.setOnClickListener(v -> {
-            startActivity(new Intent(WelcomeActivity.this, /*LoginActivity.class*/ ProfileActivity.class));
+            startActivity(new Intent(WelcomeActivity.this, LoginActivity.class));
         });
     }
 }
