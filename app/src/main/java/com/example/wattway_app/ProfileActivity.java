@@ -14,7 +14,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private TextView userName, userEmail;
+    private TextView welcome, userEmail;
     private AppCompatButton signOutButton, favoriteStations, changePassword, editEmail;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
@@ -31,25 +31,19 @@ public class ProfileActivity extends AppCompatActivity {
         currentUser = mAuth.getCurrentUser();
 
         // UI references
-        userName = findViewById(R.id.userName);
+        welcome = findViewById(R.id.welcome); // updated ID
         userEmail = findViewById(R.id.userEmail);
         signOutButton = findViewById(R.id.signOutButton);
         favoriteStations = findViewById(R.id.favoriteStations);
         changePassword = findViewById(R.id.changePassword);
         editEmail = findViewById(R.id.editEmail);
 
-        // Get name and email from Intent
-        String nameFromIntent = getIntent().getStringExtra("fullName");
-        String emailFromIntent = getIntent().getStringExtra("email");
-
-        // Display user info
+        // Display static welcome message and email
+        welcome.setText("Welcome 👋");
         if (currentUser != null) {
-            String fallbackEmail = currentUser.getEmail();
-
-            userName.setText(nameFromIntent != null ? nameFromIntent : "Username");
-            userEmail.setText(emailFromIntent != null ? emailFromIntent : fallbackEmail != null ? fallbackEmail : "Email not available");
+            String email = currentUser.getEmail();
+            userEmail.setText(email != null ? email : "Email not available");
         } else {
-            userName.setText("Guest");
             userEmail.setText("Not signed in");
         }
 
