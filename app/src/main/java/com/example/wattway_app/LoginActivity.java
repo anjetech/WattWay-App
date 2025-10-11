@@ -56,9 +56,7 @@ public class LoginActivity extends AppCompatActivity {
 
             if (task.isSuccessful()) {
                 Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(LoginActivity.this, HomePageActivity.class);
-                startActivity(intent);
-                finish();
+                goToHome();   // <-- use your helper so back stack is cleared
             } else {
                 String msg = task.getException() != null ? task.getException().getMessage() : "Login failed";
                 Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
@@ -81,7 +79,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private void goToHome() {
         Intent i = new Intent(this, HomePageActivity.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        // Clear everything behind Home so you can't fall back to Register/Login
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(i);
         finish();
     }
