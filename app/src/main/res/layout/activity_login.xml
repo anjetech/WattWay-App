@@ -55,6 +55,16 @@
             android:layout_gravity="center"
             android:layout_marginBottom="20dp"/>
 
+        <!-- Full Name -->
+        <EditText
+            android:id="@+id/etFullName"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Full Name"
+            android:inputType="textPersonName"
+            android:padding="12dp"
+            android:background="@drawable/rounded_edittext"/>
+
         <!-- Email -->
         <EditText
             android:id="@+id/etEmailLogin"
@@ -63,6 +73,7 @@
             android:hint="Email Address"
             android:inputType="textEmailAddress"
             android:padding="12dp"
+            android:layout_marginTop="10dp"
             android:background="@drawable/rounded_edittext"/>
 
         <!-- Password with Eye Toggle -->

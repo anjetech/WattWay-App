@@ -17,7 +17,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText etEmailLogin, etPasswordLogin;
+    private EditText etFullName, etEmailLogin, etPasswordLogin;
     private ImageView ivToggleLoginPassword;
     private AppCompatButton btnLogin;
     private TextView tvGoRegister, tvForgotPassword;
@@ -32,6 +32,7 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         // Link UI elements
+        etFullName = findViewById(R.id.etFullName); // Added full name field
         etEmailLogin = findViewById(R.id.etEmailLogin);
         etPasswordLogin = findViewById(R.id.etPasswordLogin);
         ivToggleLoginPassword = findViewById(R.id.ivToggleLoginPassword);
@@ -63,9 +64,15 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void signIn() {
+        String fullName = etFullName.getText().toString().trim(); // Get name
         String email = etEmailLogin.getText().toString().trim();
         String pass  = etPasswordLogin.getText().toString().trim();
 
+        if (TextUtils.isEmpty(fullName)) {
+            etFullName.setError("Name required");
+            etFullName.requestFocus();
+            return;
+        }
         if (TextUtils.isEmpty(email)) {
             etEmailLogin.setError("Email required");
             etEmailLogin.requestFocus();
@@ -86,7 +93,7 @@ public class LoginActivity extends AppCompatActivity {
 
             if (task.isSuccessful()) {
                 Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
-                goToHome();
+                goToHome(fullName, email);
             } else {
                 String msg = task.getException() != null ? task.getException().getMessage() : "Login failed";
                 Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
@@ -107,8 +114,10 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show());
     }
 
-    private void goToHome() {
+    private void goToHome(String fullName, String email) {
         Intent i = new Intent(this, HomePageActivity.class);
+        i.putExtra("fullName", fullName);
+        i.putExtra("email", email);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(i);
         finish();
@@ -119,7 +128,8 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            goToHome();
+            // Optional: You can skip name here or use stored name later
+            goToHome("User", user.getEmail()); // Fallback name
         }
     }
 }
