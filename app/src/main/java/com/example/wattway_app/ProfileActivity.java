@@ -38,13 +38,16 @@ public class ProfileActivity extends AppCompatActivity {
         changePassword = findViewById(R.id.changePassword);
         editEmail = findViewById(R.id.editEmail);
 
+        // Get name and email from Intent
+        String nameFromIntent = getIntent().getStringExtra("fullName");
+        String emailFromIntent = getIntent().getStringExtra("email");
+
         // Display user info
         if (currentUser != null) {
-            String name = currentUser.getDisplayName(); // May be null if not set
-            String email = currentUser.getEmail();
+            String fallbackEmail = currentUser.getEmail();
 
-            userName.setText(name != null ? name : "Username");
-            userEmail.setText(email != null ? email : "Email not available");
+            userName.setText(nameFromIntent != null ? nameFromIntent : "Username");
+            userEmail.setText(emailFromIntent != null ? emailFromIntent : fallbackEmail != null ? fallbackEmail : "Email not available");
         } else {
             userName.setText("Guest");
             userEmail.setText("Not signed in");

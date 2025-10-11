@@ -23,7 +23,7 @@ public class WelcomeActivity extends AppCompatActivity {
         });
 
         btnSignIn.setOnClickListener(v -> {
-            startActivity(new Intent(WelcomeActivity.this, LoginActivity.class));
+            startActivity(new Intent(WelcomeActivity.this, /*LoginActivity.class*/ ProfileActivity.class));
         });
     }
 }
