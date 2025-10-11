@@ -1,4 +1,4 @@
-package com.example.wattway_app;   // <- match your package
+package com.example.wattway_app;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -37,7 +37,10 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(v -> signIn());
         tvGoRegister.setOnClickListener(v ->
                 startActivity(new Intent(this, RegisterActivity.class)));
-        tvForgotPassword.setOnClickListener(v -> sendResetEmail());
+        tvForgotPassword.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void signIn() {
@@ -62,19 +65,6 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
             }
         });
-    }
-
-    private void sendResetEmail() {
-        String email = etEmailLogin.getText().toString().trim();
-        if (TextUtils.isEmpty(email)) {
-            etEmailLogin.setError("Enter your email to reset");
-            etEmailLogin.requestFocus();
-            return;
-        }
-        mAuth.sendPasswordResetEmail(email).addOnCompleteListener(t ->
-                Toast.makeText(this,
-                        t.isSuccessful() ? "Password reset email sent" : "Could not send reset email",
-                        Toast.LENGTH_SHORT).show());
     }
 
     private void goToHome() {
