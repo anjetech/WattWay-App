@@ -43,6 +43,11 @@
             android:name=".ForgotPasswordActivity"
             android:exported="false"
             android:theme="@style/Theme.WattWay.NoActionBar" />
+
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="true"
+            android:theme="@style/Theme.WattWay.NoActionBar"/>
     </application>
 
 </manifest>

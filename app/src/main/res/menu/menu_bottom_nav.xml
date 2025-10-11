@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_map"
+        android:icon="@drawable/ic_map_24"
+        android:title="Map" />
+
+    <item
+        android:id="@+id/nav_stations"
+        android:icon="@drawable/ic_station_24"
+        android:title="Stations" />
+
+    <item
+        android:id="@+id/nav_load"
+        android:icon="@drawable/ic_load_24"
+        android:title="Load" />
+
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/ic_person_24"
+        android:title="Profile" />
+
+</menu>

@@ -2,9 +2,11 @@ package com.example.wattway_app;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,9 +25,12 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText fullNameEditText, emailEditText, passwordEditText, confirmPasswordEditText;
     private Button registerButton;
     private TextView tvLogin;
+    private ImageView ivTogglePassword, ivToggleConfirm;
 
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
+
+    private String fullName, email;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,55 +55,88 @@ public class RegisterActivity extends AppCompatActivity {
         confirmPasswordEditText = findViewById(R.id.etConfirmPassword);
         registerButton = findViewById(R.id.btnRegister);
         tvLogin = findViewById(R.id.tvLogin);
+        ivTogglePassword = findViewById(R.id.ivTogglePassword);
+        ivToggleConfirm = findViewById(R.id.ivToggleConfirm);
 
-        // Handle "Already have an account? Sign In" click
-        tvLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(RegisterActivity.this, "Navigating to Login", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                startActivity(intent);
-            }
+        // Toggle password visibility
+        ivTogglePassword.setOnClickListener(v -> {
+            togglePasswordVisibility(passwordEditText);
         });
 
+        ivToggleConfirm.setOnClickListener(v -> {
+            togglePasswordVisibility(confirmPasswordEditText);
+        });
+
+        // Handle "Already have an account? Sign In" click
+        tvLogin.setOnClickListener(v -> {
+            Toast.makeText(RegisterActivity.this, "Navigating to Login", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+        });
 
         // Register logic
         registerButton.setOnClickListener(v -> {
-            String fullName = fullNameEditText.getText().toString().trim();
-            String email = emailEditText.getText().toString().trim();
+            fullName = fullNameEditText.getText().toString().trim();
+            email    = emailEditText.getText().toString().trim();
             String password = passwordEditText.getText().toString().trim();
-            String confirmPassword = confirmPasswordEditText.getText().toString().trim();
+            String confirm  = confirmPasswordEditText.getText().toString().trim();
 
-            if (fullName.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-                Toast.makeText(RegisterActivity.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+            if (fullName.isEmpty() || email.isEmpty() || password.isEmpty() || confirm.isEmpty()) {
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (!password.equals(confirm)) {
+                Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if (!password.equals(confirmPassword)) {
-                Toast.makeText(RegisterActivity.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
-                return;
-            }
+            registerButton.setEnabled(false);
 
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            String userId = mAuth.getCurrentUser().getUid();
-                            User user = new User(fullName, email);
-                            mDatabase.child(userId).setValue(user)
-                                    .addOnSuccessListener(aVoid -> {
-                                        Toast.makeText(RegisterActivity.this, "Registration successful!", Toast.LENGTH_SHORT).show();
-                                        // Navigate to login screen after successful registration
-                                        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                                        startActivity(intent);
-                                        finish(); // Optional: close RegisterActivity
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        Toast.makeText(RegisterActivity.this, "Failed to save user data", Toast.LENGTH_SHORT).show();
-                                    });
-                        } else {
-                            Toast.makeText(RegisterActivity.this, "Registration failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        registerButton.setEnabled(true);
+
+                        if (!task.isSuccessful()) {
+                            Toast.makeText(this,
+                                    "Registration failed: " +
+                                            (task.getException() != null ? task.getException().getMessage() : ""),
+                                    Toast.LENGTH_LONG).show();
+                            return;
                         }
+
+                        // Save user profile to Firebase Database
+                        String userId = mAuth.getCurrentUser().getUid();
+                        User user = new User(fullName, email);
+
+                        mDatabase.child(userId).setValue(user)
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show();
+                                    goToHome(fullName, email);
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(this, "Saved auth, but failed to save profile: " + e.getMessage(),
+                                            Toast.LENGTH_LONG).show();
+                                    goToHome(fullName, email); // Still go to home
+                                });
                     });
         });
+    }
+
+    private void togglePasswordVisibility(EditText editText) {
+        if (editText.getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
+            editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+        } else {
+            editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        }
+        editText.setSelection(editText.getText().length());
+    }
+
+    private void goToHome(String fullName, String email) {
+        Intent i = new Intent(this, HomePageActivity.class);
+        i.putExtra("fullName", fullName);
+        i.putExtra("email", email);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        Toast.makeText(this, "Navigating to HomePageActivity", Toast.LENGTH_SHORT).show();
+        startActivity(i);
+        finish();
     }
 }
