@@ -29,9 +29,14 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
 
         fused = LocationServices.getFusedLocationProviderClient(this);
 
-        SupportMapFragment mapFragment =
-                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        if (mapFragment != null) mapFragment.getMapAsync(this);
+        // create and attach the SupportMapFragment *programmatically* to map_container
+        SupportMapFragment mapFragment = SupportMapFragment.newInstance();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.map_container, mapFragment, "MAP")
+                .commitNowAllowingStateLoss();
+
+        mapFragment.getMapAsync(this);
     }
 
     @Override
