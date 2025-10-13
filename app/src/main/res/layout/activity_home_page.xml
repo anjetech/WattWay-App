@@ -77,9 +77,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         app:menu="@menu/menu_bottom_nav"
-        app:itemIconTint="?attr/colorOnPrimaryContainer"
-        app:itemTextColor="?attr/colorOnPrimaryContainer"
-        app:labelVisibilityMode="labeled"
-        app:layout_insetEdge="bottom"/>
-
+        app:itemIconTint="@color/black"
+        app:itemTextColor="@color/black"
+        app:labelVisibilityMode="labeled"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
