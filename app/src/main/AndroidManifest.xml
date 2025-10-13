@@ -20,6 +20,7 @@
             android:name=".StationsActivity"
             android:exported="false" />
 
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDlabfhFvHknFT95ffZ0Y9JCYe4bVm0qZ4" />
@@ -52,6 +53,9 @@
             android:name=".ProfileActivity"
             android:exported="true"
             android:theme="@style/Theme.WattWay.NoActionBar" />
+
+
+
     </application>
 
 </manifest>
