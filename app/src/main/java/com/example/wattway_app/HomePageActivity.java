@@ -4,6 +4,10 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
+
+import android.content.Intent;
+
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -22,6 +26,11 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
     private GoogleMap mMap;
     private FusedLocationProviderClient fused;
 
+
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +46,7 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
                 .commitNowAllowingStateLoss();
 
         mapFragment.getMapAsync(this);
+        setupBottomNav();
     }
 
     @Override
@@ -77,4 +87,35 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQ_LOCATION) enableMyLocation();
     }
+
+
+    private void setupBottomNav() {
+        com.google.android.material.bottomnavigation.BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+
+        // Highlight the active tab
+        bottomNav.setSelectedItemId(R.id.nav_map);
+
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_map) {
+                return true; // already here
+
+            } else if (id == R.id.nav_stations) {
+                startActivity(new Intent(this, StationsActivity.class));
+                overridePendingTransition(0, 0);
+                return true;
+
+            } else if (id == R.id.nav_load) {
+                startActivity(new Intent(this, LoadsheddingActivity.class));
+                overridePendingTransition(0, 0);
+                return true;
+            } else if (id == R.id.nav_profile) {
+                startActivity(new Intent(this, ProfileActivity.class));
+                overridePendingTransition(0, 0);
+                return true;
+            }
+            return false;
+        });
+    }
+
 }
