@@ -6,13 +6,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
+    <!--added code -->
+
+
+    <!-- SAFE placeholder: we'll add the map in code after checks -->
+    <FrameLayout
+        android:id="@+id/map_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
     <!-- Map placeholder (we’ll swap in SupportMapFragment later) -->
+    <!--
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
+-->
     <!-- Top search bar -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/searchCard"
