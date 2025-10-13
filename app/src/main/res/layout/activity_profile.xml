@@ -13,8 +13,8 @@
         android:id="@+id/profileScroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#1A8BE4"
-        android:paddingBottom="80dp">  <!-- space so content doesn't hide behind the nav -->
+        android:background="#50AEF8"
+        android:paddingBottom="0dp">  <!-- space so content doesn't hide behind the nav -->
 
         <LinearLayout
             android:id="@+id/profileContent"
@@ -119,12 +119,12 @@
                 android:id="@+id/signOutButton"
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="32dp"
+                android:backgroundTint="#D32F2F"
                 android:text="Sign Out"
                 android:textColor="#FFFFFF"
-                android:textStyle="bold"
-                android:backgroundTint="#D32F2F"
-                android:layout_gravity="center"
-                android:layout_marginTop="32dp" />
+                android:textStyle="bold" />
         </LinearLayout>
     </ScrollView>
 
@@ -137,5 +137,6 @@
         app:menu="@menu/menu_bottom_nav"
         app:itemIconTint="@color/black"
         app:itemTextColor="@color/black"
-        app:labelVisibilityMode="labeled"/>
+        app:labelVisibilityMode="labeled"
+        app:itemIconSize="30dp"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
