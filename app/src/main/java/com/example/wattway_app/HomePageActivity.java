@@ -1,12 +1,15 @@
 package com.example.wattway_app;
 
 import android.Manifest;
-import android.content.pm.PackageManager;
-import android.os.Bundle;
-
-
 import android.content.Intent;
-
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.os.Bundle;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,17 +22,16 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.io.IOException;
+import java.util.List;
 
 public class HomePageActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private static final int REQ_LOCATION = 1001;
     private GoogleMap mMap;
     private FusedLocationProviderClient fused;
-
-
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +40,6 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
 
         fused = LocationServices.getFusedLocationProviderClient(this);
 
-        // create and attach the SupportMapFragment *programmatically* to map_container
         SupportMapFragment mapFragment = SupportMapFragment.newInstance();
         getSupportFragmentManager()
                 .beginTransaction()
@@ -47,6 +48,7 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
 
         mapFragment.getMapAsync(this);
         setupBottomNav();
+        setupSearchBar();
     }
 
     @Override
@@ -88,23 +90,18 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
         if (requestCode == REQ_LOCATION) enableMyLocation();
     }
 
-
     private void setupBottomNav() {
-        com.google.android.material.bottomnavigation.BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
-
-        // Highlight the active tab
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setSelectedItemId(R.id.nav_map);
 
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.nav_map) {
-                return true; // already here
-
+                return true;
             } else if (id == R.id.nav_stations) {
                 startActivity(new Intent(this, StationsActivity.class));
                 overridePendingTransition(0, 0);
                 return true;
-
             } else if (id == R.id.nav_load) {
                 startActivity(new Intent(this, LoadsheddingActivity.class));
                 overridePendingTransition(0, 0);
@@ -118,4 +115,35 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
         });
     }
 
+    private void setupSearchBar() {
+        EditText etSearch = findViewById(R.id.etSearch);
+        etSearch.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH ||
+                    (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                String query = etSearch.getText().toString().trim();
+                if (!query.isEmpty()) {
+                    searchCity(query);
+                }
+                return true;
+            }
+            return false;
+        });
+    }
+
+    private void searchCity(String cityName) {
+        Geocoder geocoder = new Geocoder(this);
+        try {
+            List<Address> addresses = geocoder.getFromLocationName(cityName, 1);
+            if (addresses != null && !addresses.isEmpty()) {
+                Address address = addresses.get(0);
+                LatLng cityLatLng = new LatLng(address.getLatitude(), address.getLongitude());
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(cityLatLng, 12f));
+            } else {
+                Toast.makeText(this, "City not found", Toast.LENGTH_SHORT).show();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error finding city", Toast.LENGTH_SHORT).show();
+        }
+    }
 }

@@ -6,6 +6,13 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.MenuItem;
+import androidx.appcompat.app.AppCompatActivity;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
@@ -23,9 +30,11 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        bottomNav.getMenu().clear();                 // ensure a clean slate
+        bottomNav.inflateMenu(R.menu.menu_bottom_nav);  // force the correct menu file
         getWindow().setStatusBarColor(Color.parseColor("#1A8BE4")); // Match your background
-
+        setupBottomNav();
         // Firebase setup
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
@@ -67,6 +76,34 @@ public class ProfileActivity extends AppCompatActivity {
 
         editEmail.setOnClickListener(v -> {
             Toast.makeText(this, "Feature coming soon!", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private void setupBottomNav() {
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        bottomNav.setSelectedItemId(R.id.nav_profile);
+
+        bottomNav.setOnItemSelectedListener((MenuItem item) -> {
+            int id = item.getItemId();
+            if (id == R.id.nav_map) {
+                startActivity(new Intent(this, HomePageActivity.class));
+                overridePendingTransition(0, 0);
+                finish();
+                return true;
+            } else if (id == R.id.nav_stations) {
+                startActivity(new Intent(this, StationsActivity.class));
+                overridePendingTransition(0, 0);
+                finish();
+                return true;
+            } else if (id == R.id.nav_load) {
+                startActivity(new Intent(this, LoadsheddingActivity.class));
+                overridePendingTransition(0, 0);
+                finish();
+                return true;
+            } else if (id == R.id.nav_profile) {
+                return true;
+            }
+            return false;
         });
     }
 }
