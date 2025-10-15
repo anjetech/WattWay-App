@@ -45,7 +45,6 @@ public class ProfileActivity extends AppCompatActivity {
         signOutButton = findViewById(R.id.signOutButton);
         favoriteStations = findViewById(R.id.favoriteStations);
         changePassword = findViewById(R.id.changePassword);
-        editEmail = findViewById(R.id.editEmail);
 
         // Display static welcome message and email
         welcome.setText("Welcome 👋");
@@ -71,12 +70,10 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         changePassword.setOnClickListener(v -> {
-            Toast.makeText(this, "Feature coming soon!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(ProfileActivity.this, ForgotPasswordActivity.class);
+            startActivity(intent);
         });
 
-        editEmail.setOnClickListener(v -> {
-            Toast.makeText(this, "Feature coming soon!", Toast.LENGTH_SHORT).show();
-        });
     }
 
     private void setupBottomNav() {

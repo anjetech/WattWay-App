@@ -104,15 +104,6 @@
                 android:layout_marginTop="12dp" />
 
             <!-- Edit Email -->
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/editEmail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Edit Email"
-                android:textColor="#2196F3"
-                android:textStyle="bold"
-                android:background="@drawable/rounded_white_button"
-                android:layout_marginTop="12dp" />
 
             <!-- Sign Out Button -->
             <androidx.appcompat.widget.AppCompatButton
@@ -121,13 +112,12 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="32dp"
-                android:backgroundTint="#D32F2F"
+                android:backgroundTint="#FFFFFF"
                 android:text="Sign Out"
-                android:textColor="#FFFFFF"
+                android:textColor="#000000"
                 android:textStyle="bold" />
         </LinearLayout>
     </ScrollView>
-
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
@@ -139,4 +129,5 @@
         app:itemTextColor="@color/black"
         app:labelVisibilityMode="labeled"
         app:itemIconSize="30dp"/>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
