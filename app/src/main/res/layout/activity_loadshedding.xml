@@ -6,9 +6,9 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F5F5F5"
     tools:context=".LoadsheddingActivity">
 
-    <!-- Your page content goes here -->
     <FrameLayout
         android:id="@+id/content_container"
         android:layout_width="0dp"
@@ -16,9 +16,220 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNav" />
+        app:layout_constraintBottom_toTopOf="@+id/bottomNav">
 
-    <!-- Bottom navigation pinned to bottom -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Header -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#64B5F6"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Loadshedding Schedule"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="16dp"/>
+
+                    <!-- Search Bar -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardCornerRadius="25dp"
+                        app:cardElevation="2dp"
+                        android:layout_marginBottom="8dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="12dp"
+                            android:gravity="center_vertical">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@android:drawable/ic_menu_search"
+                                android:layout_marginStart="4dp"
+                                android:layout_marginEnd="12dp"/>
+
+                            <EditText
+                                android:id="@+id/etSearchArea"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:hint="Search area (e.g., Stellenbosch Central)"
+                                android:textSize="14sp"
+                                android:background="@android:color/transparent"
+                                android:inputType="text"/>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+                </LinearLayout>
+
+                <!-- Search Results Container -->
+                <LinearLayout
+                    android:id="@+id/searchResultsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:visibility="gone"/>
+
+                <!-- Content Area -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Selected Area Card -->
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cardSelectedArea"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="2dp"
+                        android:layout_marginBottom="16dp"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Selected Area"
+                                android:textSize="12sp"
+                                android:textColor="#666666"
+                                android:layout_marginBottom="8dp"/>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:id="@+id/tvSelectedArea"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Stellenbosch Central"
+                                        android:textSize="18sp"
+                                        android:textStyle="bold"
+                                        android:textColor="#000000"/>
+
+                                    <TextView
+                                        android:id="@+id/tvBlock"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Block 7"
+                                        android:textSize="14sp"
+                                        android:textColor="#666666"
+                                        android:layout_marginTop="4dp"/>
+                                </LinearLayout>
+
+                                <TextView
+                                    android:id="@+id/tvStageLabel"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Stage 2"
+                                    android:textSize="14sp"
+                                    android:textColor="#FFFFFF"
+                                    android:background="@drawable/stage_badge"
+                                    android:paddingStart="16dp"
+                                    android:paddingEnd="16dp"
+                                    android:paddingTop="6dp"
+                                    android:paddingBottom="6dp"/>
+                            </LinearLayout>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- Active Loadshedding Card -->
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cardActiveLoadshedding"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardCornerRadius="8dp"
+                        app:cardElevation="2dp"
+                        android:layout_marginBottom="16dp"
+                        android:visibility="gone">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="16dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Active Loadshedding"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="#000000"/>
+
+                            <TextView
+                                android:id="@+id/tvActiveTime"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Ends at 12:30 today"
+                                android:textSize="12sp"
+                                android:textColor="#666666"
+                                android:layout_marginTop="4dp"/>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- Schedule Date Header -->
+                    <TextView
+                        android:id="@+id/tvScheduleDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Today - Monday, 1 Sep"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#000000"
+                        android:layout_marginBottom="12dp"
+                        android:visibility="gone"/>
+
+                    <!-- Schedule Container -->
+                    <LinearLayout
+                        android:id="@+id/scheduleContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone"/>
+
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+
+    </FrameLayout>
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="0dp"
