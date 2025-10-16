@@ -17,7 +17,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private EditText etEmailLogin, etPasswordLogin;
     private AppCompatButton btnLogin;
-    private TextView tvGoRegister, tvForgotPassword;
+    private TextView tvGoRegister;
 
     private FirebaseAuth mAuth;
 
@@ -32,30 +32,33 @@ public class LoginActivity extends AppCompatActivity {
         etPasswordLogin = findViewById(R.id.etPasswordLogin);
         btnLogin = findViewById(R.id.btnLogin);
         tvGoRegister = findViewById(R.id.tvGoRegister);
-        tvForgotPassword = findViewById(R.id.tvForgotPassword);
 
         btnLogin.setOnClickListener(v -> signIn());
         tvGoRegister.setOnClickListener(v ->
                 startActivity(new Intent(this, RegisterActivity.class)));
-        tvForgotPassword.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
-            startActivity(intent);
-        });
     }
 
     private void signIn() {
         String email = etEmailLogin.getText().toString().trim();
         String pass  = etPasswordLogin.getText().toString().trim();
 
-        if (TextUtils.isEmpty(email)) { etEmailLogin.setError("Email required"); etEmailLogin.requestFocus(); return; }
-        if (TextUtils.isEmpty(pass))  { etPasswordLogin.setError("Password required"); etPasswordLogin.requestFocus(); return; }
+        if (TextUtils.isEmpty(email)) {
+            etEmailLogin.setError("Email required");
+            etEmailLogin.requestFocus();
+            return;
+        }
+        if (TextUtils.isEmpty(pass))  {
+            etPasswordLogin.setError("Password required");
+            etPasswordLogin.requestFocus();
+            return;
+        }
 
         btnLogin.setEnabled(false);
         btnLogin.setText("Signing in…");
 
         mAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(this, task -> {
             btnLogin.setEnabled(true);
-            btnLogin.setText("LOGIN");
+            btnLogin.setText("Sign in");
 
             if (task.isSuccessful()) {
                 Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
@@ -79,6 +82,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) { goToHome(); }
+        if (user != null) {
+            goToHome();
+        }
     }
 }

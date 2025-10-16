@@ -116,41 +116,18 @@
             android:background="@drawable/rounded_button"
             android:layout_marginTop="20dp"/>
 
-        <!-- Forgot / Create account row -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <!-- Create account link only -->
+        <TextView
+            android:id="@+id/tvGoRegister"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginTop="16dp">
-
-            <TextView
-                android:id="@+id/tvForgotPassword"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Forgot password?"
-                android:textColor="#1E90FF"
-                android:textSize="16sp"
-                android:clickable="true"
-                android:focusable="true"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="   |   "
-                android:textSize="16sp"
-                android:textColor="#888888"/>
-
-            <TextView
-                android:id="@+id/tvGoRegister"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Create account"
-                android:textColor="#1E90FF"
-                android:textSize="16sp"
-                android:clickable="true"
-                android:focusable="true"/>
-        </LinearLayout>
+            android:text="Don't have an account? Create account"
+            android:textColor="#1E90FF"
+            android:textSize="16sp"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:clickable="true"
+            android:focusable="true"/>
 
         <!-- Note -->
         <TextView

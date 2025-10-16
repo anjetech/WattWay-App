@@ -98,44 +98,74 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Filter chips (each chip has explicit width/height) -->
+            <!-- Filter chips -->
             <com.google.android.material.chip.ChipGroup
                 android:id="@+id/chipFilters"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                app:singleSelection="false"
+                app:singleSelection="true"
                 app:singleLine="true">
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/chipAll"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/Widget.Material3.Chip.Assist.Elevated"
-                    android:text="All" />
+                    style="@style/Widget.Material3.Chip.Filter.Elevated"
+                    android:text="All"
+                    android:checked="true" />
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/chipNearest"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/Widget.Material3.Chip.Assist.Elevated"
+                    style="@style/Widget.Material3.Chip.Filter.Elevated"
                     android:text="Nearest" />
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/chipFastCharge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/Widget.Material3.Chip.Assist.Elevated"
+                    style="@style/Widget.Material3.Chip.Filter.Elevated"
                     android:text="Fast Charge" />
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/chipBackupPower"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    style="@style/Widget.Material3.Chip.Assist.Elevated"
+                    style="@style/Widget.Material3.Chip.Filter.Elevated"
                     android:text="Backup Power" />
             </com.google.android.material.chip.ChipGroup>
 
-            <!-- Placeholder space for now -->
-            <Space
+            <!-- Progress Bar -->
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="32dp"
+                android:visibility="gone" />
+
+            <!-- No Stations Message -->
+            <TextView
+                android:id="@+id/tvNoStations"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No charging stations found nearby"
+                android:textSize="16sp"
+                android:textColor="#666666"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="48dp"
+                android:visibility="gone" />
+
+            <!-- Stations Container -->
+            <LinearLayout
+                android:id="@+id/stationsContainer"
                 android:layout_width="match_parent"
-                android:layout_height="400dp" />
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp" />
+
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

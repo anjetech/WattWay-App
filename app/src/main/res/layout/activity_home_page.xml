@@ -6,25 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
-    <!--added code -->
-
-
-    <!-- SAFE placeholder: we'll add the map in code after checks -->
+    <!-- Map container -->
     <FrameLayout
         android:id="@+id/map_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-
-    <!-- Map placeholder (we’ll swap in SupportMapFragment later) -->
-    <!--
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
--->
     <!-- Top search bar -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/searchCard"
@@ -48,8 +35,8 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/ic_search_24"
-                android:contentDescription="@string/search" />
+                android:src="@android:drawable/ic_menu_search"
+                android:contentDescription="Search" />
 
             <EditText
                 android:id="@+id/etSearch"
@@ -59,6 +46,7 @@
                 android:hint="Search"
                 android:background="@android:color/transparent"
                 android:paddingStart="12dp"
+                android:paddingEnd="12dp"
                 android:inputType="text" />
 
             <com.google.android.material.chip.Chip
@@ -66,9 +54,244 @@
                 style="@style/Widget.Material3.Chip.Assist.Elevated"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/filters" />
+                android:text="Filters" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
+
+    <!-- Directions Info Card (Initially Hidden) -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/directionsInfoCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="70dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tvStationNameCard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Charging Station"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#000000" />
+
+            <TextView
+                android:id="@+id/tvStationAddressCard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Station Address"
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:layout_marginTop="4dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="12dp">
+
+                <TextView
+                    android:id="@+id/tvDistanceCard"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Distance: --"
+                    android:textSize="14sp"
+                    android:textColor="#333333" />
+
+                <TextView
+                    android:id="@+id/tvDurationCard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Duration: --"
+                    android:textSize="14sp"
+                    android:textColor="#333333" />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnStartDirections"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="12dp"
+                android:text="Start Navigation"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:backgroundTint="#2196F3" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Navigation Bottom Sheet -->
+    <LinearLayout
+        android:id="@+id/directionsBottomSheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:elevation="16dp"
+        android:padding="16dp"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        app:behavior_hideable="true"
+        app:behavior_peekHeight="180dp">
+
+        <!-- Current Step -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Current Step"
+            android:textSize="12sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/tvCurrentStep"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Turn right onto Main Street"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Distance and Time -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:id="@+id/tvRemainingDistance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="300m"
+                android:textSize="16sp"
+                android:textColor="#2196F3"
+                android:textStyle="bold"
+                android:layout_marginEnd="24dp" />
+
+            <TextView
+                android:id="@+id/tvRemainingTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2 min"
+                android:textSize="16sp"
+                android:textColor="#4CAF50"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Next Step -->
+        <TextView
+            android:id="@+id/tvNextStep"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Then: Continue straight for 2km"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E0E0E0"
+            android:layout_marginVertical="8dp" />
+
+        <!-- All Steps ScrollView -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="All Steps"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:layout_marginBottom="8dp" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="200dp">
+
+            <LinearLayout
+                android:id="@+id/directionsStepsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+        </ScrollView>
+
+    </LinearLayout>
+
+    <!-- Loading Container (for initial load) -->
+    <LinearLayout
+        android:id="@+id/loadingContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Getting directions..."
+            android:textSize="16sp"
+            android:textColor="#666666" />
+    </LinearLayout>
+
+    <!-- My Location FAB -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabMyLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|top"
+        android:layout_marginTop="100dp"
+        android:layout_marginEnd="16dp"
+        android:src="@android:drawable/ic_menu_mylocation"
+        app:fabSize="mini"
+        app:backgroundTint="#FFFFFF"
+        app:elevation="4dp"
+        android:visibility="gone" />
+
+    <!-- Directions FAB (shown when station is selected) -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabDirections"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="200dp"
+        android:src="@android:drawable/ic_menu_directions"
+        app:fabSize="normal"
+        app:backgroundTint="#4CAF50"
+        android:visibility="gone" />
+
+    <!-- Stop Navigation FAB (shown during navigation) -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabStopNavigation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="260dp"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        app:fabSize="normal"
+        app:backgroundTint="#F44336"
+        android:visibility="gone" />
 
     <!-- Bottom navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -80,4 +303,5 @@
         app:itemIconTint="@color/black"
         app:itemTextColor="@color/black"
         app:labelVisibilityMode="labeled"/>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
