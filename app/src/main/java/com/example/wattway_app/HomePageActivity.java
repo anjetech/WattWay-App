@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -81,6 +82,7 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
     private BottomNavigationView bottomNav;
     private CardView directionsInfoCard;
     private FloatingActionButton fabMyLocation, fabDirections, fabStopNavigation;
+    private FrameLayout fabCancelNavigation;
     private TextView tvStationNameCard, tvStationAddressCard, tvDistanceCard, tvDurationCard;
     private Button btnStartDirections;
     private LinearLayout loadingContainer, directionsStepsContainer;
@@ -88,11 +90,6 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
     private View directionsBottomSheet;
     private TextView tvCurrentStep, tvNextStep, tvRemainingDistance, tvRemainingTime;
     private BottomSheetBehavior<View> bottomSheetBehavior;
-
-    // UI State
-    private boolean uiElementsVisible = true;
-    private final Handler uiHandler = new Handler(Looper.getMainLooper());
-    private Runnable hideUiRunnable;
 
     // Station Navigation
     private Marker stationMarker;
@@ -105,7 +102,7 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
     private int currentStepIndex = 0;
     private final List<NavigationStep> navigationSteps = new ArrayList<>();
 
-    // Navigation Step class - moved to top for visibility
+    // Navigation Step class
     public static class NavigationStep {
         String instruction;
         String distance;
@@ -134,6 +131,7 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
         fabMyLocation = findViewById(R.id.fabMyLocation);
         fabDirections = findViewById(R.id.fabDirections);
         fabStopNavigation = findViewById(R.id.fabStopNavigation);
+        fabCancelNavigation = findViewById(R.id.fabCancelNavigation);
         tvStationNameCard = findViewById(R.id.tvStationNameCard);
         tvStationAddressCard = findViewById(R.id.tvStationAddressCard);
         tvDistanceCard = findViewById(R.id.tvDistanceCard);
@@ -153,7 +151,20 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
         if (directionsBottomSheet != null) {
             bottomSheetBehavior = BottomSheetBehavior.from(directionsBottomSheet);
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-            bottomSheetBehavior.setPeekHeight(200);
+            bottomSheetBehavior.setPeekHeight(500);
+            bottomSheetBehavior.setHideable(true);
+            bottomSheetBehavior.setFitToContents(true);
+            bottomSheetBehavior.setSkipCollapsed(false);
+
+            bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+                @Override
+                public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                }
+
+                @Override
+                public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+                }
+            });
         }
     }
 
@@ -178,7 +189,6 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
         setupSearchBar();
         setupDirectionsButton();
         setupFABs();
-        resetUiTimer();
     }
 
     private void checkIntentForStation() {
@@ -189,6 +199,9 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
             stationLng = intent.getDoubleExtra("station_lng", 0);
             stationName = intent.getStringExtra("station_name");
             stationAddress = intent.getStringExtra("station_address");
+
+            android.util.Log.d("HomePageActivity", "Intent received - Station: " + stationName +
+                    " at (" + stationLat + ", " + stationLng + ")");
         }
     }
 
@@ -199,6 +212,8 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
                 Location location = locationResult.getLastLocation();
                 if (location != null) {
                     currentLocation = location;
+                    android.util.Log.d("HomePageActivity", "Location updated: " +
+                            location.getLatitude() + ", " + location.getLongitude());
 
                     // Update navigation if active
                     if (isNavigating) {
@@ -228,8 +243,6 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.getUiSettings().setCompassEnabled(true);
-
-        mMap.setOnMapClickListener(latLng -> toggleUiElements());
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -272,6 +285,9 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
                 .addOnSuccessListener(this, location -> {
                     if (location != null) {
                         currentLocation = location;
+                        android.util.Log.d("HomePageActivity", "Current location obtained: " +
+                                location.getLatitude() + ", " + location.getLongitude());
+
                         if (mMap != null && !mapCentered) {
                             LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f));
@@ -281,9 +297,15 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
                                 showStationOnMap();
                             }
                         }
+                    } else {
+                        android.util.Log.w("HomePageActivity", "Location is null, trying getLastLocation");
+                        getLastLocation();
                     }
                 })
-                .addOnFailureListener(e -> getLastLocation());
+                .addOnFailureListener(e -> {
+                    android.util.Log.e("HomePageActivity", "Failed to get current location", e);
+                    getLastLocation();
+                });
     }
 
     private void getLastLocation() {
@@ -296,6 +318,9 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
                 .addOnSuccessListener(this, location -> {
                     if (location != null) {
                         currentLocation = location;
+                        android.util.Log.d("HomePageActivity", "Last location obtained: " +
+                                location.getLatitude() + ", " + location.getLongitude());
+
                         if (mMap != null && !mapCentered) {
                             LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15f));
@@ -305,6 +330,8 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
                                 showStationOnMap();
                             }
                         }
+                    } else {
+                        android.util.Log.w("HomePageActivity", "Last location is also null");
                     }
                 });
     }
@@ -425,6 +452,13 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
             fabStopNavigation.setOnClickListener(v -> stopNavigation());
             fabStopNavigation.setVisibility(View.GONE);
         }
+
+        if (fabCancelNavigation != null) {
+            fabCancelNavigation.setOnClickListener(v -> stopNavigation());
+            android.util.Log.d("HomePageActivity", "Cancel button initialized successfully");
+        } else {
+            android.util.Log.e("HomePageActivity", "Cancel button is NULL - check XML ID!");
+        }
     }
 
     private void setupDirectionsButton() {
@@ -436,16 +470,32 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
 
     private void startInAppNavigation() {
         if (currentLocation == null) {
-            Toast.makeText(this, R.string.getting_location, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Getting your location...", Toast.LENGTH_SHORT).show();
+
+            getCurrentLocation();
+
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                if (currentLocation != null) {
+                    startInAppNavigation();
+                } else {
+                    Toast.makeText(this, "Unable to get your location. Please enable location services and try again.",
+                            Toast.LENGTH_LONG).show();
+                    if (loadingContainer != null) {
+                        loadingContainer.setVisibility(View.GONE);
+                    }
+                }
+            }, 3000);
             return;
         }
 
-        // Show loading
+        android.util.Log.d("HomePageActivity", "Starting navigation from " +
+                currentLocation.getLatitude() + "," + currentLocation.getLongitude() +
+                " to " + stationLat + "," + stationLng);
+
         if (loadingContainer != null) {
             loadingContainer.setVisibility(View.VISIBLE);
         }
 
-        // Fetch directions from Google Directions API
         fetchDirections();
     }
 
@@ -461,9 +511,16 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
                         "&mode=driving" +
                         "&key=" + DIRECTIONS_API_KEY;
 
+                android.util.Log.d("DirectionsAPI", "Request URL: " + urlString);
+
                 URL url = new URL(urlString);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
+                connection.setConnectTimeout(15000);
+                connection.setReadTimeout(15000);
+
+                int responseCode = connection.getResponseCode();
+                android.util.Log.d("DirectionsAPI", "Response Code: " + responseCode);
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 StringBuilder response = new StringBuilder();
@@ -473,9 +530,32 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
                 }
                 reader.close();
 
-                JSONObject jsonResponse = new JSONObject(response.toString());
+                String jsonResponseStr = response.toString();
+                android.util.Log.d("DirectionsAPI", "Response: " + jsonResponseStr);
+
+                JSONObject jsonResponse = new JSONObject(jsonResponseStr);
+
+                String status = jsonResponse.getString("status");
+                android.util.Log.d("DirectionsAPI", "API Status: " + status);
 
                 runOnUiThread(() -> {
+                    if (!"OK".equals(status)) {
+                        String errorMessage = "Directions error: " + status;
+                        if (jsonResponse.has("error_message")) {
+                            try {
+                                errorMessage += " - " + jsonResponse.getString("error_message");
+                            } catch (Exception e) {
+                            }
+                        }
+                        android.util.Log.e("DirectionsAPI", errorMessage);
+                        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+
+                        if (loadingContainer != null) {
+                            loadingContainer.setVisibility(View.GONE);
+                        }
+                        return;
+                    }
+
                     processDirectionsResponse(jsonResponse);
                     if (loadingContainer != null) {
                         loadingContainer.setVisibility(View.GONE);
@@ -483,11 +563,12 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
                 });
 
             } catch (Exception e) {
+                android.util.Log.e("DirectionsAPI", "Error fetching directions", e);
                 runOnUiThread(() -> {
                     if (loadingContainer != null) {
                         loadingContainer.setVisibility(View.GONE);
                     }
-                    Toast.makeText(this, getString(R.string.directions_error) + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Network error: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 });
             }
         }).start();
@@ -495,28 +576,41 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
 
     private void processDirectionsResponse(JSONObject response) {
         try {
+            String status = response.getString("status");
+
+            if (!"OK".equals(status)) {
+                Toast.makeText(this, "No routes found. Status: " + status, Toast.LENGTH_LONG).show();
+                return;
+            }
+
             JSONArray routes = response.getJSONArray("routes");
             if (routes.length() == 0) {
-                Toast.makeText(this, R.string.no_routes_found, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "No routes available", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             JSONObject route = routes.getJSONObject(0);
             JSONArray legs = route.getJSONArray("legs");
+
+            if (legs.length() == 0) {
+                Toast.makeText(this, "Route has no legs", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             JSONObject leg = legs.getJSONObject(0);
 
-            // Get duration and distance
             String duration = leg.getJSONObject("duration").getString("text");
             String distance = leg.getJSONObject("distance").getString("text");
 
+            android.util.Log.d("DirectionsAPI", "Route found - Distance: " + distance + ", Duration: " + duration);
+
             if (tvDurationCard != null) {
-                tvDurationCard.setText(getString(R.string.duration_format, duration));
+                tvDurationCard.setText("Duration: " + duration);
             }
             if (tvDistanceCard != null) {
-                tvDistanceCard.setText(getString(R.string.distance_format, distance));
+                tvDistanceCard.setText("Distance: " + distance);
             }
 
-            // Parse steps
             navigationSteps.clear();
             JSONArray steps = leg.getJSONArray("steps");
 
@@ -524,7 +618,7 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
                 JSONObject step = steps.getJSONObject(i);
                 NavigationStep navStep = new NavigationStep();
                 navStep.instruction = step.getString("html_instructions")
-                        .replaceAll("<[^>]*>", ""); // Remove HTML tags
+                        .replaceAll("<[^>]*>", "");
                 navStep.distance = step.getJSONObject("distance").getString("text");
                 navStep.duration = step.getJSONObject("duration").getString("text");
 
@@ -539,31 +633,29 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
                 navigationSteps.add(navStep);
             }
 
-            // Draw route on map
-            drawRoute(route);
+            android.util.Log.d("DirectionsAPI", "Successfully parsed " + navigationSteps.size() + " steps");
 
-            // Start navigation UI
+            drawRoute(route);
             startNavigationUI();
 
         } catch (Exception e) {
-            Toast.makeText(this, R.string.processing_error, Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
+            android.util.Log.e("DirectionsAPI", "Error processing directions", e);
+            Toast.makeText(this, "Error processing route: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
     private void drawRoute(JSONObject route) {
         try {
-            // Clear existing route
             if (currentRoute != null) {
                 currentRoute.remove();
             }
 
-            // Decode polyline
             JSONObject overviewPolyline = route.getJSONObject("overview_polyline");
             String encodedPolyline = overviewPolyline.getString("points");
             List<LatLng> decodedPath = decodePolyline(encodedPolyline);
 
-            // Draw new route
+            android.util.Log.d("DirectionsAPI", "Drawing route with " + decodedPath.size() + " points");
+
             PolylineOptions polylineOptions = new PolylineOptions()
                     .addAll(decodedPath)
                     .width(12)
@@ -572,7 +664,6 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
 
             currentRoute = mMap.addPolyline(polylineOptions);
 
-            // Zoom to show entire route
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             for (LatLng point : decodedPath) {
                 builder.include(point);
@@ -581,7 +672,7 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
             mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
 
         } catch (Exception e) {
-            e.printStackTrace();
+            android.util.Log.e("DirectionsAPI", "Error drawing route", e);
         }
     }
 
@@ -622,37 +713,32 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
         isNavigating = true;
         currentStepIndex = 0;
 
-        // Update UI buttons
         if (btnStartDirections != null) {
             btnStartDirections.setText(R.string.stop_navigation);
             btnStartDirections.setOnClickListener(v -> stopNavigation());
         }
 
-        // Show navigation bottom sheet
         if (bottomSheetBehavior != null) {
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }
 
-        // Show stop navigation FAB
-        if (fabStopNavigation != null) {
-            fabStopNavigation.setVisibility(View.VISIBLE);
+        if (fabDirections != null) {
+            fabDirections.setVisibility(View.GONE);
         }
 
-        // Hide directions info card
+        if (fabStopNavigation != null) {
+            fabStopNavigation.setVisibility(View.GONE);
+        }
+
         if (directionsInfoCard != null) {
             directionsInfoCard.setVisibility(View.GONE);
         }
 
-        // Display first step
         updateNavigationDisplay();
-
-        // Show all steps in the container
         displayAllSteps();
-
-        // Start location updates for navigation
         startNavigationLocationUpdates();
 
-        Toast.makeText(this, R.string.navigation_started, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Navigation started", Toast.LENGTH_SHORT).show();
     }
 
     private void displayAllSteps() {
@@ -663,25 +749,44 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
 
         for (int i = 0; i < navigationSteps.size(); i++) {
             NavigationStep step = navigationSteps.get(i);
-            View stepView = inflater.inflate(android.R.layout.simple_list_item_2, directionsStepsContainer, false);
 
-            TextView text1 = stepView.findViewById(android.R.id.text1);
-            TextView text2 = stepView.findViewById(android.R.id.text2);
-
-            text1.setText(String.format(Locale.getDefault(), "%d. %s", (i + 1), step.instruction));
-            text2.setText(String.format(Locale.getDefault(), "%s • %s", step.distance, step.duration));
+            LinearLayout stepLayout = new LinearLayout(this);
+            stepLayout.setOrientation(LinearLayout.VERTICAL);
+            stepLayout.setPadding(0, 12, 0, 12);
 
             if (i == currentStepIndex) {
-                stepView.setBackgroundColor(Color.parseColor("#E3F2FD"));
+                stepLayout.setBackgroundColor(Color.parseColor("#E3F2FD"));
             }
 
-            directionsStepsContainer.addView(stepView);
+            TextView stepInstruction = new TextView(this);
+            stepInstruction.setText(String.format(Locale.getDefault(), "%d. %s", (i + 1), step.instruction));
+            stepInstruction.setTextSize(15);
+            stepInstruction.setTextColor(Color.BLACK);
+            stepInstruction.setPadding(8, 0, 8, 4);
+
+            TextView stepDetails = new TextView(this);
+            stepDetails.setText(String.format(Locale.getDefault(), "%s • %s", step.distance, step.duration));
+            stepDetails.setTextSize(13);
+            stepDetails.setTextColor(Color.parseColor("#666666"));
+            stepDetails.setPadding(8, 0, 8, 0);
+
+            stepLayout.addView(stepInstruction);
+            stepLayout.addView(stepDetails);
+
+            if (i < navigationSteps.size() - 1) {
+                View divider = new View(this);
+                divider.setLayoutParams(new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT, 1));
+                divider.setBackgroundColor(Color.parseColor("#E0E0E0"));
+                stepLayout.addView(divider);
+            }
+
+            directionsStepsContainer.addView(stepLayout);
         }
     }
 
     private void updateNavigationDisplay() {
         if (currentStepIndex >= navigationSteps.size()) {
-            // Reached destination
             arriveAtDestination();
             return;
         }
@@ -702,13 +807,13 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
 
         if (tvNextStep != null && currentStepIndex < navigationSteps.size() - 1) {
             NavigationStep nextStep = navigationSteps.get(currentStepIndex + 1);
-            tvNextStep.setText(getString(R.string.then_format, nextStep.instruction));
+            tvNextStep.setText(nextStep.instruction);
             tvNextStep.setVisibility(View.VISIBLE);
         } else if (tvNextStep != null) {
-            tvNextStep.setVisibility(View.GONE);
+            tvNextStep.setText("Arriving at destination");
+            tvNextStep.setVisibility(View.VISIBLE);
         }
 
-        // Update the steps list to highlight current step
         displayAllSteps();
     }
 
@@ -717,24 +822,20 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
 
         NavigationStep currentStep = navigationSteps.get(currentStepIndex);
 
-        // Check distance to current step's end point
         float[] results = new float[1];
         Location.distanceBetween(location.getLatitude(), location.getLongitude(),
                 currentStep.endLat, currentStep.endLng, results);
 
-        // If within 20 meters of the step's end point, move to next step
         if (results[0] < 20) {
             currentStepIndex++;
             updateNavigationDisplay();
 
-            // Announce the new instruction
             if (currentStepIndex < navigationSteps.size()) {
                 Toast.makeText(this, navigationSteps.get(currentStepIndex).instruction,
                         Toast.LENGTH_LONG).show();
             }
         }
 
-        // Update camera to follow user
         if (mMap != null) {
             LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 17f));
@@ -756,7 +857,7 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
     }
 
     private void arriveAtDestination() {
-        Toast.makeText(this, R.string.destination_arrived, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "You have arrived at your destination!", Toast.LENGTH_LONG).show();
         stopNavigation();
     }
 
@@ -764,118 +865,42 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
         isNavigating = false;
         currentStepIndex = 0;
 
-        // Clear route from map
         if (currentRoute != null) {
             currentRoute.remove();
             currentRoute = null;
         }
 
-        // Reset UI
         if (btnStartDirections != null) {
             btnStartDirections.setText(R.string.start_navigation);
             btnStartDirections.setOnClickListener(v -> startInAppNavigation());
         }
 
-        // Hide navigation UI
         if (bottomSheetBehavior != null) {
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        }
+
+        if (fabDirections != null) {
+            fabDirections.setVisibility(View.VISIBLE);
         }
 
         if (fabStopNavigation != null) {
             fabStopNavigation.setVisibility(View.GONE);
         }
 
-        // Show directions info card again
         if (directionsInfoCard != null) {
             directionsInfoCard.setVisibility(View.VISIBLE);
         }
 
-        // Stop frequent location updates
         fusedLocationClient.removeLocationUpdates(locationCallback);
-
-        // Restart normal location updates
         startLocationUpdates();
 
-        Toast.makeText(this, R.string.navigation_stopped, Toast.LENGTH_SHORT).show();
-    }
-
-    private void toggleUiElements() {
-        if (uiElementsVisible) {
-            hideUiElements();
-        } else {
-            showUiElements();
-        }
-    }
-
-    private void hideUiElements() {
-        uiElementsVisible = false;
-
-        if (searchCard != null) {
-            searchCard.animate()
-                    .translationY(-searchCard.getHeight())
-                    .alpha(0f)
-                    .setDuration(300)
-                    .withEndAction(() -> searchCard.setVisibility(View.GONE))
-                    .start();
-        }
-
-        if (bottomNav != null && !isNavigating) {
-            bottomNav.animate()
-                    .translationY(bottomNav.getHeight())
-                    .alpha(0f)
-                    .setDuration(300)
-                    .withEndAction(() -> bottomNav.setVisibility(View.GONE))
-                    .start();
-        }
-    }
-
-    private void showUiElements() {
-        uiElementsVisible = true;
-
-        if (searchCard != null) {
-            searchCard.setVisibility(View.VISIBLE);
-            searchCard.setAlpha(0f);
-            searchCard.setTranslationY(-searchCard.getHeight());
-            searchCard.animate()
-                    .translationY(0)
-                    .alpha(1f)
-                    .setDuration(300)
-                    .start();
-        }
-
-        if (bottomNav != null) {
-            bottomNav.setVisibility(View.VISIBLE);
-            bottomNav.setAlpha(0f);
-            bottomNav.setTranslationY(bottomNav.getHeight());
-            bottomNav.animate()
-                    .translationY(0)
-                    .alpha(1f)
-                    .setDuration(300)
-                    .start();
-        }
-
-        resetUiTimer();
-    }
-
-    private void resetUiTimer() {
-        if (hideUiRunnable != null) {
-            uiHandler.removeCallbacks(hideUiRunnable);
-        }
-
-        hideUiRunnable = () -> {
-            if (uiElementsVisible && !isNavigating) {
-                hideUiElements();
-            }
-        };
-        uiHandler.postDelayed(hideUiRunnable, 5000);
+        Toast.makeText(this, "Navigation stopped", Toast.LENGTH_SHORT).show();
     }
 
     private void setupBottomNav() {
         if (bottomNav != null) {
             bottomNav.setSelectedItemId(R.id.nav_map);
             bottomNav.setOnItemSelectedListener(item -> {
-                resetUiTimer();
-
                 int id = item.getItemId();
                 if (id == R.id.nav_map) {
                     return true;
@@ -899,12 +924,6 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
 
     private void setupSearchBar() {
         if (etSearch != null) {
-            etSearch.setOnFocusChangeListener((v, hasFocus) -> {
-                if (hasFocus) {
-                    resetUiTimer();
-                }
-            });
-
             etSearch.setOnEditorActionListener((v, actionId, event) -> {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH ||
                         (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER &&
@@ -913,7 +932,6 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
                     if (!query.isEmpty()) {
                         searchLocation(query);
                     }
-                    resetUiTimer();
                     return true;
                 }
                 return false;
@@ -932,10 +950,10 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
                 LatLng searchLatLng = new LatLng(address.getLatitude(), address.getLongitude());
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(searchLatLng, 12f));
             } else {
-                Toast.makeText(this, R.string.location_not_found, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Location not found", Toast.LENGTH_SHORT).show();
             }
         } catch (IOException e) {
-            Toast.makeText(this, getString(R.string.search_error) + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Search error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -948,7 +966,7 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 enableLocationFeatures();
             } else {
-                Toast.makeText(this, R.string.location_permission_required, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Location permission is required for this app", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -972,9 +990,6 @@ public class HomePageActivity extends AppCompatActivity implements OnMapReadyCal
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (hideUiRunnable != null) {
-            uiHandler.removeCallbacks(hideUiRunnable);
-        }
         if (fusedLocationClient != null && locationCallback != null) {
             fusedLocationClient.removeLocationUpdates(locationCallback);
         }

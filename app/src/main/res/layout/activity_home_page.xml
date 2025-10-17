@@ -6,11 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Map container -->
+    <!-- Map container with bottom padding -->
     <FrameLayout
         android:id="@+id/map_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:paddingBottom="80dp"/>
 
     <!-- Top search bar -->
     <com.google.android.material.card.MaterialCardView
@@ -66,7 +67,7 @@
         android:layout_gravity="bottom"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="70dp"
+        android:layout_marginBottom="90dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="8dp"
         android:visibility="gone">
@@ -131,106 +132,202 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Navigation Bottom Sheet -->
-    <LinearLayout
+    <!-- Navigation Bottom Sheet - TWO STATES ONLY -->
+    <androidx.cardview.widget.CardView
         android:id="@+id/directionsBottomSheet"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@android:color/white"
-        android:elevation="16dp"
-        android:padding="16dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="16dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         app:behavior_hideable="true"
-        app:behavior_peekHeight="180dp">
+        app:behavior_peekHeight="180dp"
+        app:behavior_fitToContents="true"
+        app:behavior_skipCollapsed="false">
 
-        <!-- Current Step -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Current Step"
-            android:textSize="12sp"
-            android:textColor="#666666"
-            android:layout_marginBottom="4dp" />
-
-        <TextView
-            android:id="@+id/tvCurrentStep"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Turn right onto Main Street"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="#000000"
-            android:layout_marginBottom="8dp" />
-
-        <!-- Distance and Time -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="12dp">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="@android:color/white">
 
-            <TextView
-                android:id="@+id/tvRemainingDistance"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="300m"
-                android:textSize="16sp"
-                android:textColor="#2196F3"
-                android:textStyle="bold"
-                android:layout_marginEnd="24dp" />
-
-            <TextView
-                android:id="@+id/tvRemainingTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2 min"
-                android:textSize="16sp"
-                android:textColor="#4CAF50"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <!-- Next Step -->
-        <TextView
-            android:id="@+id/tvNextStep"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Then: Continue straight for 2km"
-            android:textSize="14sp"
-            android:textColor="#666666"
-            android:layout_marginBottom="12dp" />
-
-        <!-- Divider -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#E0E0E0"
-            android:layout_marginVertical="8dp" />
-
-        <!-- All Steps ScrollView -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="All Steps"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="#000000"
-            android:layout_marginBottom="8dp" />
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="200dp">
-
+            <!-- Top Section with Drag Handle -->
             <LinearLayout
-                android:id="@+id/directionsStepsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
-        </ScrollView>
+                android:orientation="vertical"
+                android:paddingTop="4dp"
+                android:background="@android:color/white">
 
-    </LinearLayout>
+                <!-- Drag Handle (centered) -->
+                <View
+                    android:id="@+id/dragHandle"
+                    android:layout_width="40dp"
+                    android:layout_height="4dp"
+                    android:background="#CCCCCC"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="12dp"/>
 
-    <!-- Loading Container (for initial load) -->
+                <!-- Current Step with Cancel Button -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:layout_marginBottom="8dp"
+                    android:gravity="center_vertical">
+
+                    <!-- Current Step Instruction -->
+                    <TextView
+                        android:id="@+id/tvCurrentStep"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Head south on Markgraaff St toward Henry St"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="#000000"
+                        android:lineSpacingExtra="2dp"
+                        android:layout_marginEnd="12dp"/>
+
+                    <!-- Cancel Button (Next to text) -->
+                    <FrameLayout
+                        android:id="@+id/fabCancelNavigation"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/circle_cancel_button"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="Cancel Navigation">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="✕"
+                            android:textSize="20sp"
+                            android:textColor="#FF0000"
+                            android:textStyle="bold"/>
+                    </FrameLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Main Content Container -->
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:fillViewport="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:paddingBottom="24dp">
+
+                    <!-- Distance and Time -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:id="@+id/tvRemainingDistance"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0.6 km"
+                            android:textSize="14sp"
+                            android:textColor="#000000"
+                            android:layout_marginEnd="8dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="•"
+                            android:textSize="14sp"
+                            android:textColor="#666666"
+                            android:layout_marginEnd="8dp"/>
+
+                        <TextView
+                            android:id="@+id/tvRemainingTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="1 min"
+                            android:textSize="14sp"
+                            android:textColor="#000000" />
+                    </LinearLayout>
+
+                    <!-- Divider (only visible when collapsed) -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#E0E0E0"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- Next Step Preview -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="16dp"
+                        android:padding="12dp"
+                        android:background="#F5F5F5">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Then"
+                            android:textSize="13sp"
+                            android:textColor="#666666"
+                            android:layout_marginEnd="8dp"/>
+
+                        <TextView
+                            android:id="@+id/tvNextStep"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Continue onto President Boshof St"
+                            android:textSize="13sp"
+                            android:textColor="#333333"
+                            android:maxLines="2"
+                            android:ellipsize="end"/>
+                    </LinearLayout>
+
+                    <!-- All Steps Header -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="All Steps"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="#000000"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- All Steps Container -->
+                    <LinearLayout
+                        android:id="@+id/directionsStepsContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"/>
+
+                </LinearLayout>
+
+            </androidx.core.widget.NestedScrollView>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Loading Container -->
     <LinearLayout
         android:id="@+id/loadingContainer"
         android:layout_width="match_parent"
@@ -267,30 +364,24 @@
         app:elevation="4dp"
         android:visibility="gone" />
 
-    <!-- Directions FAB (shown when station is selected) -->
+    <!-- Directions FAB (Green button) -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabDirections"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="200dp"
+        android:layout_marginBottom="220dp"
         android:src="@android:drawable/ic_menu_directions"
         app:fabSize="normal"
         app:backgroundTint="#4CAF50"
         android:visibility="gone" />
 
-    <!-- Stop Navigation FAB (shown during navigation) -->
+    <!-- Hidden FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabStopNavigation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="260dp"
-        android:src="@android:drawable/ic_menu_close_clear_cancel"
-        app:fabSize="normal"
-        app:backgroundTint="#F44336"
         android:visibility="gone" />
 
     <!-- Bottom navigation -->
