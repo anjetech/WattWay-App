@@ -6,15 +6,13 @@
     android:id="@+id/root_profile"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProfileActivity">
+    tools:context=".AdminActivity">
 
-    <!-- Content area (scrollable) -->
     <ScrollView
         android:id="@+id/profileScroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#50AEF8"
-        android:paddingBottom="0dp">  <!-- space so content doesn't hide behind the nav -->
+        android:background="#50AEF8">
 
         <LinearLayout
             android:id="@+id/profileContent"
@@ -25,7 +23,6 @@
             android:gravity="center_horizontal"
             android:background="#50AEF8">
 
-            <!-- Logo at Top -->
             <ImageView
                 android:id="@+id/logoImage"
                 android:layout_width="227dp"
@@ -35,7 +32,6 @@
                 android:contentDescription="WattWay Logo"
                 android:src="@drawable/wattway_transparent" />
 
-            <!-- App Name -->
             <TextView
                 android:id="@+id/appName"
                 android:layout_width="wrap_content"
@@ -47,65 +43,47 @@
                 android:layout_gravity="center"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Profile Title -->
             <TextView
-                android:id="@+id/profileTitle"
+                android:id="@+id/adminTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Profile"
+                android:text="Admin"
                 android:textSize="25sp"
                 android:textStyle="bold"
                 android:textColor="#FFFFFF"
                 android:layout_gravity="center"
                 android:layout_marginBottom="8dp" />
 
-            <!-- Welcome message -->
             <TextView
                 android:id="@+id/welcome"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=""
+                android:text="Welcome 👋"
                 android:textSize="18sp"
                 android:textColor="#FFFFFF"
                 android:layout_gravity="center"
                 android:layout_marginBottom="4dp" />
 
-            <!-- Email -->
-            <TextView
-                android:id="@+id/userEmail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textSize="16sp"
-                android:textColor="#FFFFFF"
-                android:layout_gravity="center"
-                android:layout_marginBottom="24dp" />
-
-            <!-- Favorite Stations -->
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/favoriteStations"
+                android:id="@+id/manageUsersButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Favorite Stations"
-                android:textColor="#2196F3"
-                android:textStyle="bold"
-                android:background="@drawable/rounded_white_button"
-                android:layout_marginTop="12dp" />
+                android:layout_marginTop="16dp"
+                android:backgroundTint="#FFFFFF"
+                android:text="Manage Users"
+                android:textColor="#000000"
+                android:textStyle="bold" />
 
-            <!-- Change Password -->
             <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/changePassword"
+                android:id="@+id/viewReportsButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Change Password"
-                android:textColor="#2196F3"
-                android:textStyle="bold"
-                android:background="@drawable/rounded_white_button"
-                android:layout_marginTop="12dp" />
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#FFFFFF"
+                android:text="View Reports"
+                android:textColor="#000000"
+                android:textStyle="bold" />
 
-            <!-- Edit Email -->
-
-            <!-- Sign Out Button -->
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/signOutButton"
                 android:layout_width="160dp"
@@ -129,5 +107,4 @@
         app:itemTextColor="@color/black"
         app:labelVisibilityMode="labeled"
         app:itemIconSize="30dp"/>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

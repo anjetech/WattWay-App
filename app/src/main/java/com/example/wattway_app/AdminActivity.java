@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.TextView;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -12,10 +11,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class ProfileActivity extends AppCompatActivity {
+public class AdminActivity extends AppCompatActivity {
 
-    private TextView welcome, userEmail;
-    private AppCompatButton signOutButton, favoriteStations, changePassword;
+    private TextView welcome;
+    private AppCompatButton signOutButton, manageUsersButton, viewReportsButton;
     private FirebaseAuth mAuth;
     private FirebaseUser currentUser;
     private BottomNavigationView bottomNav;
@@ -23,44 +22,28 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
+        setContentView(R.layout.activity_admin);
         getWindow().setStatusBarColor(Color.parseColor("#1A8BE4"));
 
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
-        bottomNav = findViewById(R.id.bottomNav);
 
         welcome = findViewById(R.id.welcome);
-        userEmail = findViewById(R.id.userEmail);
         signOutButton = findViewById(R.id.signOutButton);
-        favoriteStations = findViewById(R.id.favoriteStations);
-        changePassword = findViewById(R.id.changePassword);
+        manageUsersButton = findViewById(R.id.manageUsersButton);
+        viewReportsButton = findViewById(R.id.viewReportsButton);
+        bottomNav = findViewById(R.id.bottomNav);
 
         welcome.setText("Welcome 👋");
 
-        if (currentUser != null) {
-            String email = currentUser.getEmail();
-            userEmail.setText(email != null ? email : "Email not available");
-        } else {
-            userEmail.setText("Not signed in");
-        }
-
         signOutButton.setOnClickListener(v -> {
             mAuth.signOut();
-            Intent intent = new Intent(ProfileActivity.this, WelcomeActivity.class);
+            Intent intent = new Intent(AdminActivity.this, WelcomeActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
             finish();
         });
 
-        favoriteStations.setOnClickListener(v -> {
-            Toast.makeText(this, "Feature coming soon!", Toast.LENGTH_SHORT).show();
-        });
-
-        changePassword.setOnClickListener(v -> {
-            Intent intent = new Intent(ProfileActivity.this, ForgotPasswordActivity.class);
-            startActivity(intent);
-        });
 
         loadBottomNavByRole();
     }
@@ -76,15 +59,14 @@ public class ProfileActivity extends AppCompatActivity {
                 bottomNav.getMenu().clear();
 
                 if ("admin".equals(role)) {
-                    // Redirect admins away from Profile screen
-                    Intent intent = new Intent(ProfileActivity.this, AdminActivity.class);
-                    startActivity(intent);
-                    finish();
+                    bottomNav.inflateMenu(R.menu.menu_bottom_nav_admin);
+                    bottomNav.setSelectedItemId(R.id.nav_admin);
                 } else {
                     bottomNav.inflateMenu(R.menu.menu_bottom_nav_user);
                     bottomNav.setSelectedItemId(R.id.nav_profile);
-                    setupBottomNav();
                 }
+
+                setupBottomNav();
             }
         });
     }
@@ -105,6 +87,14 @@ public class ProfileActivity extends AppCompatActivity {
                 overridePendingTransition(0, 0);
                 return true;
             } else if (id == R.id.nav_profile) {
+                startActivity(new Intent(this, ProfileActivity.class));
+                overridePendingTransition(0, 0);
+                return true;
+            } else if (id == R.id.nav_admin) {
+                if (!(this instanceof AdminActivity)) {
+                    startActivity(new Intent(this, AdminActivity.class));
+                    overridePendingTransition(0, 0);
+                }
                 return true;
             }
             return false;

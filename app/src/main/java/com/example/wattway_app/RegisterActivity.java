@@ -19,6 +19,10 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -29,6 +33,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
+    private FirebaseFirestore firestore;
 
     private String fullName, email;
 
@@ -47,6 +52,7 @@ public class RegisterActivity extends AppCompatActivity {
         // Initialize Firebase
         mAuth = FirebaseAuth.getInstance();
         mDatabase = FirebaseDatabase.getInstance().getReference("Users");
+        firestore = FirebaseFirestore.getInstance();
 
         // Link UI elements
         fullNameEditText = findViewById(R.id.etFullName);
@@ -103,17 +109,25 @@ public class RegisterActivity extends AppCompatActivity {
                             return;
                         }
 
-                        // Save user profile to Firebase Database
                         String userId = mAuth.getCurrentUser().getUid();
-                        User user = new User(fullName, email);
 
-                        mDatabase.child(userId).setValue(user)
+                        // Save to Realtime Database (optional)
+                        User user = new User(fullName, email);
+                        mDatabase.child(userId).setValue(user);
+
+                        // Save to Firestore with role
+                        Map<String, Object> userData = new HashMap<>();
+                        userData.put("name", fullName);
+                        userData.put("email", email);
+                        userData.put("role", "user"); // default role
+
+                        firestore.collection("users").document(userId).set(userData)
                                 .addOnSuccessListener(aVoid -> {
                                     Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show();
                                     goToHome(fullName, email);
                                 })
                                 .addOnFailureListener(e -> {
-                                    Toast.makeText(this, "Saved auth, but failed to save profile: " + e.getMessage(),
+                                    Toast.makeText(this, "Saved auth, but failed to save role: " + e.getMessage(),
                                             Toast.LENGTH_LONG).show();
                                     goToHome(fullName, email); // Still go to home
                                 });

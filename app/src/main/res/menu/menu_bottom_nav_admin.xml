@@ -17,8 +17,8 @@
         android:title="Load" />
 
     <item
-        android:id="@+id/nav_profile"
+        android:id="@+id/nav_admin"
         android:icon="@drawable/ic_person_24"
-        android:title="Profile" />
+        android:title="Admin" />
 
 </menu>

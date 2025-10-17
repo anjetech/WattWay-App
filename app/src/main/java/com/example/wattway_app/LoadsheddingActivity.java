@@ -20,6 +20,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.annotations.SerializedName;
 
 import java.text.SimpleDateFormat;
@@ -72,13 +75,67 @@ public class LoadsheddingActivity extends AppCompatActivity {
         tvScheduleDate.setVisibility(View.GONE);
         searchResultsContainer.setVisibility(View.GONE);
 
-        setupBottomNav();
+        loadBottomNavByRole();
         setupSearch();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+    }
+
+    private void loadBottomNavByRole() {
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (currentUser == null) return;
+
+        String uid = currentUser.getUid();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("users").document(uid).get().addOnSuccessListener(document -> {
+            if (document.exists()) {
+                String role = document.getString("role");
+                bottomNav.getMenu().clear();
+
+                if ("admin".equals(role)) {
+                    bottomNav.inflateMenu(R.menu.menu_bottom_nav_admin);
+                    bottomNav.setSelectedItemId(R.id.nav_load);
+                } else {
+                    bottomNav.inflateMenu(R.menu.menu_bottom_nav_user);
+                    bottomNav.setSelectedItemId(R.id.nav_load);
+                }
+
+                setupBottomNav(bottomNav);
+            }
+        });
+    }
+
+    private void setupBottomNav(BottomNavigationView bottomNav) {
+        bottomNav.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            Intent intent = null;
+
+            if (id == R.id.nav_map) {
+                intent = new Intent(this, HomePageActivity.class);
+            } else if (id == R.id.nav_stations) {
+                intent = new Intent(this, StationsActivity.class);
+            } else if (id == R.id.nav_load) {
+                return true;
+            } else if (id == R.id.nav_profile) {
+                intent = new Intent(this, ProfileActivity.class);
+            } else if (id == R.id.nav_admin) {
+                intent = new Intent(this, AdminActivity.class);
+            }
+
+            if (intent != null) {
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+                return true;
+            }
+
+            return false;
         });
     }
 
@@ -335,36 +392,6 @@ public class LoadsheddingActivity extends AppCompatActivity {
         }
     }
 
-    private void setupBottomNav() {
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
-        bottomNav.setSelectedItemId(R.id.nav_load);
-
-        bottomNav.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem item) {
-                int id = item.getItemId();
-                if (id == R.id.nav_map) {
-                    startActivity(new Intent(LoadsheddingActivity.this, HomePageActivity.class));
-                    overridePendingTransition(0, 0);
-                    finish();
-                    return true;
-                } else if (id == R.id.nav_stations) {
-                    startActivity(new Intent(LoadsheddingActivity.this, StationsActivity.class));
-                    overridePendingTransition(0, 0);
-                    finish();
-                    return true;
-                } else if (id == R.id.nav_load) {
-                    return true;
-                } else if (id == R.id.nav_profile) {
-                    startActivity(new Intent(LoadsheddingActivity.this, ProfileActivity.class));
-                    overridePendingTransition(0, 0);
-                    finish();
-                    return true;
-                }
-                return false;
-            }
-        });
-    }
 
     interface EskomApiService {
         @GET("status")
