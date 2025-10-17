@@ -3,7 +3,6 @@ package com.example.wattway_app;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,7 +17,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -27,7 +25,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
-import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,10 +41,11 @@ import retrofit2.http.Query;
 
 public class StationsActivity extends AppCompatActivity {
 
-    // OpenChargeMap API Key
     private static final String OCM_API_KEY = "5697ac5d-7169-4f6c-ab6c-047272aa2c34";
     private static final String BASE_URL = "https://api.openchargemap.io/v3/";
     private static final int LOCATION_PERMISSION_REQUEST = 1001;
+    private static final int NEARBY_RADIUS_KM = 50;
+    private static final int SEARCH_RADIUS_KM = 500;
 
     private LinearLayout stationsContainer;
     private ProgressBar progressBar;
@@ -56,11 +54,12 @@ public class StationsActivity extends AppCompatActivity {
     private ChipGroup chipFilters;
 
     private FusedLocationProviderClient fusedLocationClient;
-    private double currentLat = 0.0;
-    private double currentLng = 0.0;
+    private double currentLat = -33.9608;
+    private double currentLng = 25.6022;
     private List<ChargingStation> allStations = new ArrayList<>();
     private List<ChargingStation> filteredStations = new ArrayList<>();
     private String currentFilter = "All";
+    private boolean isSearchMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +75,8 @@ public class StationsActivity extends AppCompatActivity {
 
         if (checkLocationPermission()) {
             getCurrentLocationAndLoadStations();
+        } else {
+            fetchNearbyStations(NEARBY_RADIUS_KM);
         }
     }
 
@@ -86,23 +87,106 @@ public class StationsActivity extends AppCompatActivity {
         etSearchStation = findViewById(R.id.etSearchStation);
         chipFilters = findViewById(R.id.chipFilters);
 
-        // Initially hide no stations message
         tvNoStations.setVisibility(View.GONE);
     }
 
     private void setupSearch() {
+        etSearchStation.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH ||
+                    (event != null && event.getKeyCode() == android.view.KeyEvent.KEYCODE_ENTER &&
+                            event.getAction() == android.view.KeyEvent.ACTION_DOWN)) {
+                String query = etSearchStation.getText().toString().trim();
+                if (!query.isEmpty()) {
+                    searchLocationAndFetchStations(query);
+                    android.view.inputmethod.InputMethodManager imm =
+                            (android.view.inputmethod.InputMethodManager) getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(etSearchStation.getWindowToken(), 0);
+                }
+                return true;
+            }
+            return false;
+        });
+
         etSearchStation.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterStations(s.toString());
+                String searchText = s.toString().trim();
+                if (searchText.isEmpty()) {
+                    isSearchMode = false;
+                    if (currentFilter.equals("Nearest")) {
+                        getCurrentLocationAndLoadStations();
+                    } else {
+                        fetchNearbyStations(NEARBY_RADIUS_KM);
+                    }
+                } else if (searchText.length() >= 2) {
+                    isSearchMode = true;
+                    filterStations(searchText);
+                }
             }
 
             @Override
             public void afterTextChanged(Editable s) {}
         });
+    }
+
+    private void searchLocationAndFetchStations(String locationName) {
+        progressBar.setVisibility(View.VISIBLE);
+
+        new Thread(() -> {
+            try {
+                android.location.Geocoder geocoder = new android.location.Geocoder(this, java.util.Locale.getDefault());
+                List<android.location.Address> addresses = geocoder.getFromLocationName(locationName, 5);
+
+                if (addresses != null && !addresses.isEmpty()) {
+                    android.location.Address bestAddress = null;
+                    for (android.location.Address address : addresses) {
+                        if (address.getCountryCode() != null &&
+                                address.getCountryCode().equalsIgnoreCase("ZA")) {
+                            bestAddress = address;
+                            break;
+                        }
+                    }
+
+                    if (bestAddress == null) {
+                        bestAddress = addresses.get(0);
+                    }
+
+                    final double searchLat = bestAddress.getLatitude();
+                    final double searchLng = bestAddress.getLongitude();
+                    final String foundLocation = bestAddress.getLocality() != null ?
+                            bestAddress.getLocality() : bestAddress.getFeatureName();
+
+                    runOnUiThread(() -> {
+                        currentLat = searchLat;
+                        currentLng = searchLng;
+                        isSearchMode = true;
+
+                        Toast.makeText(this,
+                                "Searching near " + foundLocation,
+                                Toast.LENGTH_SHORT).show();
+
+                        fetchNearbyStations(SEARCH_RADIUS_KM);
+                    });
+                } else {
+                    runOnUiThread(() -> {
+                        progressBar.setVisibility(View.GONE);
+                        Toast.makeText(this,
+                                "Location not found. Try: Johannesburg, Cape Town, Durban, etc.",
+                                Toast.LENGTH_LONG).show();
+                    });
+                }
+            } catch (Exception e) {
+                runOnUiThread(() -> {
+                    progressBar.setVisibility(View.GONE);
+                    Toast.makeText(this,
+                            "Search error: " + e.getMessage(),
+                            Toast.LENGTH_SHORT).show();
+                });
+            }
+        }).start();
     }
 
     private void setupFilters() {
@@ -112,7 +196,15 @@ public class StationsActivity extends AppCompatActivity {
                 Chip chip = (Chip) child;
                 chip.setOnClickListener(v -> {
                     currentFilter = chip.getText().toString();
-                    applyFilter();
+
+                    etSearchStation.setText("");
+                    isSearchMode = false;
+
+                    if (currentFilter.equals("Nearest")) {
+                        getCurrentLocationAndLoadStations();
+                    } else {
+                        fetchNearbyStations(SEARCH_RADIUS_KM);
+                    }
                 });
             }
         }
@@ -121,29 +213,12 @@ public class StationsActivity extends AppCompatActivity {
     private void applyFilter() {
         filteredStations.clear();
 
-        switch (currentFilter) {
-            case "Nearest":
-                filteredStations.addAll(allStations);
-                Collections.sort(filteredStations, (a, b) ->
-                        Double.compare(a.getDistanceKm(), b.getDistanceKm()));
-                break;
-
-            case "Fast Charge":
-                for (ChargingStation station : allStations) {
-                    if (station.hasFastCharging()) {
-                        filteredStations.add(station);
-                    }
-                }
-                break;
-
-            case "Backup Power":
-                // Filter for stations with backup power if data available
-                filteredStations.addAll(allStations);
-                break;
-
-            default: // "All"
-                filteredStations.addAll(allStations);
-                break;
+        if (currentFilter.equals("Nearest")) {
+            filteredStations.addAll(allStations);
+            Collections.sort(filteredStations, (a, b) ->
+                    Double.compare(a.getDistanceKm(), b.getDistanceKm()));
+        } else {
+            filteredStations.addAll(allStations);
         }
 
         displayStations(filteredStations);
@@ -155,10 +230,14 @@ public class StationsActivity extends AppCompatActivity {
             return;
         }
 
+        if (isSearchMode && allStations.size() < 100) {
+            fetchNearbyStations(SEARCH_RADIUS_KM);
+        }
+
         List<ChargingStation> searchResults = new ArrayList<>();
         String searchLower = searchText.toLowerCase();
 
-        for (ChargingStation station : filteredStations) {
+        for (ChargingStation station : allStations) {
             if (station.getTitle().toLowerCase().contains(searchLower) ||
                     station.getAddressLine1().toLowerCase().contains(searchLower) ||
                     station.getTown().toLowerCase().contains(searchLower)) {
@@ -193,23 +272,25 @@ public class StationsActivity extends AppCompatActivity {
                     if (location != null) {
                         currentLat = location.getLatitude();
                         currentLng = location.getLongitude();
-                        fetchNearbyStations();
+                        android.util.Log.d("StationsActivity", "User location: " + currentLat + ", " + currentLng);
                     } else {
-                        // Use default location (Port Elizabeth)
                         currentLat = -33.9608;
                         currentLng = 25.6022;
-                        fetchNearbyStations();
+                        android.util.Log.d("StationsActivity", "Using default location");
                     }
+                    isSearchMode = false;
+                    fetchNearbyStations(NEARBY_RADIUS_KM);
                 })
                 .addOnFailureListener(e -> {
-                    // Use default location
+                    android.util.Log.e("StationsActivity", "Failed to get location", e);
                     currentLat = -33.9608;
                     currentLng = 25.6022;
-                    fetchNearbyStations();
+                    isSearchMode = false;
+                    fetchNearbyStations(NEARBY_RADIUS_KM);
                 });
     }
 
-    private void fetchNearbyStations() {
+    private void fetchNearbyStations(int radiusKm) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -217,12 +298,13 @@ public class StationsActivity extends AppCompatActivity {
 
         OpenChargeMapService service = retrofit.create(OpenChargeMapService.class);
 
-        // Search within 50km radius, max 50 results
+        int maxResults = isSearchMode ? 200 : 100;
+
         Call<List<ChargingStation>> call = service.getNearbyStations(
                 currentLat,
                 currentLng,
-                50,  // distance in km
-                50,  // max results
+                radiusKm,
+                maxResults,
                 OCM_API_KEY
         );
 
@@ -234,17 +316,21 @@ public class StationsActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     allStations = response.body();
 
-                    // Calculate distances
                     for (ChargingStation station : allStations) {
                         station.calculateDistance(currentLat, currentLng);
                     }
 
-                    // Sort by distance
                     Collections.sort(allStations, (a, b) ->
                             Double.compare(a.getDistanceKm(), b.getDistanceKm()));
 
+                    filteredStations.clear();
                     filteredStations.addAll(allStations);
-                    displayStations(filteredStations);
+
+                    if (isSearchMode) {
+                        filterStations(etSearchStation.getText().toString());
+                    } else {
+                        displayStations(filteredStations);
+                    }
                 } else {
                     showNoStationsMessage();
                 }
@@ -281,22 +367,26 @@ public class StationsActivity extends AppCompatActivity {
             TextView tvPrice = stationView.findViewById(R.id.tvStationPrice);
 
             tvName.setText(station.getTitle());
-            tvDistance.setText(String.format(Locale.getDefault(), "%.1f km", station.getDistanceKm()));
-            tvAddress.setText(station.getFullAddress());
+            tvName.setTextColor(0xFF000000);
 
-            // Set details (number of connectors, types)
+            tvDistance.setText(String.format(Locale.getDefault(), "%.1f km", station.getDistanceKm()));
+            tvDistance.setTextColor(0xFFE53935);
+
+            tvAddress.setText(station.getFullAddress());
+            tvAddress.setTextColor(0xFF757575);
+
             String details = station.getConnectorDetails();
             tvDetails.setText(details);
+            tvDetails.setTextColor(0xFF9E9E9E);
 
-            // Set price if available
             if (station.getUsageCost() != null && !station.getUsageCost().isEmpty()) {
                 tvPrice.setText(station.getUsageCost());
+                tvPrice.setTextColor(0xFF4CAF50);
                 tvPrice.setVisibility(View.VISIBLE);
             } else {
                 tvPrice.setVisibility(View.GONE);
             }
 
-            // Set click listener
             stationView.setOnClickListener(v -> {
                 Intent intent = new Intent(StationsActivity.this, HomePageActivity.class);
                 intent.putExtra("show_directions", true);
@@ -326,10 +416,7 @@ public class StationsActivity extends AppCompatActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 getCurrentLocationAndLoadStations();
             } else {
-                // Use default location
-                currentLat = -33.9608;
-                currentLng = 25.6022;
-                fetchNearbyStations();
+                fetchNearbyStations(NEARBY_RADIUS_KM);
             }
         }
     }
@@ -362,7 +449,6 @@ public class StationsActivity extends AppCompatActivity {
         });
     }
 
-    // Retrofit interface
     interface OpenChargeMapService {
         @GET("poi/")
         Call<List<ChargingStation>> getNearbyStations(
@@ -371,14 +457,6 @@ public class StationsActivity extends AppCompatActivity {
                 @Query("distance") int distance,
                 @Query("maxresults") int maxResults,
                 @Query("key") String apiKey
-        );
-
-        @GET("poi/")
-        Call<List<ChargingStation>> getNearbyStationsNoKey(
-                @Query("latitude") double latitude,
-                @Query("longitude") double longitude,
-                @Query("distance") int distance,
-                @Query("maxresults") int maxResults
         );
     }
 }

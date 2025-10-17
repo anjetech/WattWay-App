@@ -120,7 +120,7 @@ public class ChargingStation {
                 if (address.length() > 0) address.append(", ");
                 address.append(stateOrProvince);
             }
-            return address.toString();
+            return address.length() > 0 ? address.toString() : "Address not available";
         }
 
         public double getLatitude() {
@@ -209,9 +209,16 @@ public class ChargingStation {
     }
 
     // Getters for main class
+    public int getId() {
+        return id;
+    }
+
     public String getTitle() {
-        if (addressInfo != null) {
+        if (addressInfo != null && addressInfo.getTitle() != null && !addressInfo.getTitle().isEmpty()) {
             return addressInfo.getTitle();
+        }
+        if (operatorInfo != null && operatorInfo.getTitle() != null) {
+            return operatorInfo.getTitle();
         }
         return "Charging Station";
     }
@@ -300,21 +307,25 @@ public class ChargingStation {
         if (totalConnectors != 1) details.append("s");
 
         // Add connector types
-        details.append(" • ");
-        boolean first = true;
-        for (Connection conn : connections) {
-            if (!first) details.append(", ");
-            if (conn.getConnectionType() != null) {
-                details.append(conn.getConnectionType().getTitle());
-                if (conn.getPowerKW() != null) {
-                    details.append(" (").append(conn.getPowerKW()).append("kW)");
+        if (connections.size() > 0) {
+            details.append(" • ");
+            boolean first = true;
+            for (Connection conn : connections) {
+                if (!first) details.append(", ");
+                if (conn.getConnectionType() != null) {
+                    details.append(conn.getConnectionType().getTitle());
+                    if (conn.getPowerKW() != null) {
+                        details.append(" (").append(conn.getPowerKW()).append("kW)");
+                    }
                 }
+                first = false;
             }
-            first = false;
         }
 
         // Add operator info
-        details.append(" • ").append(getOperatorTitle());
+        if (operatorInfo != null) {
+            details.append(" • ").append(getOperatorTitle());
+        }
 
         return details.toString();
     }
@@ -327,5 +338,13 @@ public class ChargingStation {
 
     public double getDistanceKm() {
         return distanceKm;
+    }
+
+    public int getNumberOfPoints() {
+        return numberOfPoints;
+    }
+
+    public List<Connection> getConnections() {
+        return connections;
     }
 }
