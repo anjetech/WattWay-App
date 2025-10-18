@@ -2,13 +2,12 @@ package com.example.wattway_app;
 
 import android.os.Bundle;
 import android.content.Intent;
-import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.os.Handler;
@@ -20,13 +19,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.annotations.SerializedName;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -49,6 +44,7 @@ public class LoadsheddingActivity extends AppCompatActivity {
     private EditText etSearchArea;
     private LinearLayout scheduleContainer, searchResultsContainer;
     private CardView cardActiveLoadshedding, cardSelectedArea;
+    private BottomNavigationView bottomNav;
     private String currentAreaId = null;
     private Handler searchHandler = new Handler();
     private Runnable searchRunnable;
@@ -68,6 +64,7 @@ public class LoadsheddingActivity extends AppCompatActivity {
         searchResultsContainer = findViewById(R.id.searchResultsContainer);
         cardActiveLoadshedding = findViewById(R.id.cardActiveLoadshedding);
         cardSelectedArea = findViewById(R.id.cardSelectedArea);
+        bottomNav = findViewById(R.id.bottomNav);
 
         cardSelectedArea.setVisibility(View.GONE);
         cardActiveLoadshedding.setVisibility(View.GONE);
@@ -75,7 +72,7 @@ public class LoadsheddingActivity extends AppCompatActivity {
         tvScheduleDate.setVisibility(View.GONE);
         searchResultsContainer.setVisibility(View.GONE);
 
-        loadBottomNavByRole();
+        setupBottomNav();
         setupSearch();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -85,58 +82,29 @@ public class LoadsheddingActivity extends AppCompatActivity {
         });
     }
 
-    private void loadBottomNavByRole() {
-        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        if (currentUser == null) return;
-
-        String uid = currentUser.getUid();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.collection("users").document(uid).get().addOnSuccessListener(document -> {
-            if (document.exists()) {
-                String role = document.getString("role");
-                bottomNav.getMenu().clear();
-
-                if ("admin".equals(role)) {
-                    bottomNav.inflateMenu(R.menu.menu_bottom_nav_admin);
-                    bottomNav.setSelectedItemId(R.id.nav_load);
-                } else {
-                    bottomNav.inflateMenu(R.menu.menu_bottom_nav_user);
-                    bottomNav.setSelectedItemId(R.id.nav_load);
+    private void setupBottomNav() {
+        if (bottomNav != null) {
+            bottomNav.setSelectedItemId(R.id.nav_load);
+            bottomNav.setOnItemSelectedListener(item -> {
+                int id = item.getItemId();
+                if (id == R.id.nav_map) {
+                    startActivity(new Intent(this, HomePageActivity.class));
+                    overridePendingTransition(0, 0);
+                    return true;
+                } else if (id == R.id.nav_stations) {
+                    startActivity(new Intent(this, StationsActivity.class));
+                    overridePendingTransition(0, 0);
+                    return true;
+                } else if (id == R.id.nav_load) {
+                    return true;
+                } else if (id == R.id.nav_profile) {
+                    startActivity(new Intent(this, ProfileActivity.class));
+                    overridePendingTransition(0, 0);
+                    return true;
                 }
-
-                setupBottomNav(bottomNav);
-            }
-        });
-    }
-
-    private void setupBottomNav(BottomNavigationView bottomNav) {
-        bottomNav.setOnItemSelectedListener(item -> {
-            int id = item.getItemId();
-            Intent intent = null;
-
-            if (id == R.id.nav_map) {
-                intent = new Intent(this, HomePageActivity.class);
-            } else if (id == R.id.nav_stations) {
-                intent = new Intent(this, StationsActivity.class);
-            } else if (id == R.id.nav_load) {
-                return true;
-            } else if (id == R.id.nav_profile) {
-                intent = new Intent(this, ProfileActivity.class);
-            } else if (id == R.id.nav_admin) {
-                intent = new Intent(this, AdminActivity.class);
-            }
-
-            if (intent != null) {
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-                return true;
-            }
-
-            return false;
-        });
+                return false;
+            });
+        }
     }
 
     private void setupSearch() {
@@ -391,7 +359,6 @@ public class LoadsheddingActivity extends AppCompatActivity {
             return isoTime;
         }
     }
-
 
     interface EskomApiService {
         @GET("status")

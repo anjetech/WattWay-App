@@ -3,122 +3,138 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/root_profile"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ProfileActivity">
 
-    <!-- Content area (scrollable) -->
-    <ScrollView
-        android:id="@+id/profileScroll"
+    <!-- Profile container matching the map_container structure -->
+    <FrameLayout
+        android:id="@+id/profile_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#50AEF8"
-        android:paddingBottom="0dp">  <!-- space so content doesn't hide behind the nav -->
+        android:paddingBottom="80dp">
 
-        <LinearLayout
-            android:id="@+id/profileContent"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="24dp"
-            android:gravity="center_horizontal"
-            android:background="#50AEF8">
+            android:layout_height="match_parent"
+            android:fillViewport="true">
 
-            <!-- Logo at Top -->
-            <ImageView
-                android:id="@+id/logoImage"
-                android:layout_width="227dp"
-                android:layout_height="165dp"
-                android:layout_gravity="center"
-                android:layout_marginBottom="8dp"
-                android:contentDescription="WattWay Logo"
-                android:src="@drawable/wattway_transparent" />
-
-            <!-- App Name -->
-            <TextView
-                android:id="@+id/appName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="WattWay"
-                android:textSize="30sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:layout_gravity="center"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Profile Title -->
-            <TextView
-                android:id="@+id/profileTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Profile"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:textColor="#FFFFFF"
-                android:layout_gravity="center"
-                android:layout_marginBottom="8dp" />
-
-            <!-- Welcome message -->
-            <TextView
-                android:id="@+id/welcome"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textSize="18sp"
-                android:textColor="#FFFFFF"
-                android:layout_gravity="center"
-                android:layout_marginBottom="4dp" />
-
-            <!-- Email -->
-            <TextView
-                android:id="@+id/userEmail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textSize="16sp"
-                android:textColor="#FFFFFF"
-                android:layout_gravity="center"
-                android:layout_marginBottom="24dp" />
-
-            <!-- Favorite Stations -->
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/favoriteStations"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Favorite Stations"
-                android:textColor="#2196F3"
-                android:textStyle="bold"
-                android:background="@drawable/rounded_white_button"
-                android:layout_marginTop="12dp" />
+                android:orientation="vertical"
+                android:background="#50AEF8">
 
-            <!-- Change Password -->
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/changePassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Change Password"
-                android:textColor="#2196F3"
-                android:textStyle="bold"
-                android:background="@drawable/rounded_white_button"
-                android:layout_marginTop="12dp" />
+                <!-- Top Header Section -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="88dp"
+                    android:background="#50AEF8" />
 
-            <!-- Edit Email -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Profile"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:textColor="@android:color/white"
+                    android:gravity="center"
+                    android:layout_marginTop="-60dp"
+                    android:layout_marginBottom="40dp" />
 
-            <!-- Sign Out Button -->
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/signOutButton"
-                android:layout_width="160dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="32dp"
-                android:backgroundTint="#FFFFFF"
-                android:text="Sign Out"
-                android:textColor="#000000"
-                android:textStyle="bold" />
-        </LinearLayout>
-    </ScrollView>
+                <!-- Profile Content -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:gravity="center_horizontal">
 
+                    <!-- Logo at Top -->
+                    <ImageView
+                        android:id="@+id/logoImage"
+                        android:layout_width="227dp"
+                        android:layout_height="165dp"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="8dp"
+                        android:contentDescription="WattWay Logo"
+                        android:src="@drawable/wattway_transparent" />
+
+                    <!-- App Name -->
+                    <TextView
+                        android:id="@+id/appName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="WattWay"
+                        android:textSize="30sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="8dp" />
+
+                    <!-- Welcome message -->
+                    <TextView
+                        android:id="@+id/welcome"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textSize="18sp"
+                        android:textColor="#FFFFFF"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="4dp" />
+
+                    <!-- Email -->
+                    <TextView
+                        android:id="@+id/userEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textSize="16sp"
+                        android:textColor="#FFFFFF"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="24dp" />
+
+                    <!-- Favorite Stations -->
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/favoriteStations"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Favorite Stations"
+                        android:textColor="#2196F3"
+                        android:textStyle="bold"
+                        android:background="@drawable/rounded_white_button"
+                        android:layout_marginTop="12dp" />
+
+                    <!-- Change Password -->
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/changePassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Change Password"
+                        android:textColor="#2196F3"
+                        android:textStyle="bold"
+                        android:background="@drawable/rounded_white_button"
+                        android:layout_marginTop="12dp" />
+
+                    <!-- Sign Out Button -->
+                    <androidx.appcompat.widget.AppCompatButton
+                        android:id="@+id/signOutButton"
+                        android:layout_width="160dp"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="32dp"
+                        android:backgroundTint="#FFFFFF"
+                        android:text="Sign Out"
+                        android:textColor="#000000"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </FrameLayout>
+
+    <!-- Bottom navigation - EXACT COPY from HomePage -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
@@ -127,7 +143,6 @@
         app:menu="@menu/menu_bottom_nav_user"
         app:itemIconTint="@color/black"
         app:itemTextColor="@color/black"
-        app:labelVisibilityMode="labeled"
-        app:itemIconSize="30dp"/>
+        app:labelVisibilityMode="labeled"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
